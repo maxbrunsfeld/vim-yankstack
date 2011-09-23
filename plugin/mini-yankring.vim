@@ -1,3 +1,14 @@
+" TODO
+"
+" - after yanking in visual block mode, then moving the text from the original
+"   register to the yankring and back, the paste no longer comes out as a visual 
+"   block paste.
+"   Are there some special characters in the string that indicate that it was
+"   yanked in visual block mode, and which need to be preserved?
+"
+" - buggy behavior when trying to substitute pastes from the yankring when
+"   the last command wasn't a paste
+
 let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C']
 let s:paste_keys = ['p', 'P']
 
@@ -31,7 +42,7 @@ function! s:yank_ring_substitute_older_paste()
   for paste_key in s:paste_keys
     if s:last_change_was_equivalent_to_normal(paste_key)
       echo 'Last change was' paste_key
-      silent undo
+      exec "silent undo"
       call s:yank_ring_step_backwards()
       exec 'normal!' paste_key
       return
@@ -44,7 +55,7 @@ function! s:yank_ring_substitute_newer_paste()
   for paste_key in s:paste_keys
     if s:last_change_was_equivalent_to_normal(paste_key)
       echo 'Last change was' paste_key
-      silent undo
+      exec "silent undo"
       call s:yank_ring_step_forwards()
       exec 'normal!' paste_key
       return
@@ -92,7 +103,7 @@ endfunction
 function! s:last_change_was_equivalent_to_normal(input)
   let current_position = getpos('.')
   let current_undo_number = undotree()['seq_cur']
-  silent undo
+  exec "silent undo"
   exec 'normal!' a:input
   let change_line = line('.')
   let change_text = getline(change_line-2, change_line+2)
@@ -117,14 +128,12 @@ endif
 
 if s:yank_ring_map_keys
   for s:yank_key in s:yank_keys
-    exec 'nmap' s:yank_key '<Plug>yank_ring_'. s:yank_key
-    exec 'xmap' s:yank_key '<Plug>yank_ring_'. s:yank_key
+    exec 'map' s:yank_key '<Plug>yank_ring_'. s:yank_key
   endfor
   nmap [p <Plug>yank_ring_substitute_older_paste
   nmap ]p <Plug>yank_ring_substitute_newer_paste
+  inoremap <C-y> <C-g>u<C-r>"
   imap <M-y> <Plug>yank_ring_substitute_older_paste
   imap <M-Y> <Plug>yank_ring_substitute_newer_paste
-
-  inoremap <C-y> <C-g>u<C-r>"
 endif
 
