@@ -77,11 +77,11 @@ function! s:yank_ring_unshift(item)
   endif
 endfunction
 
-function! s:yank_ring_pop(item)
+function! s:yank_ring_pop()
   return remove(s:yank_ring, 0)
 endfunction
 
-function! s:yank_ring_shift(item)
+function! s:yank_ring_shift()
   return remove(s:yank_ring, -1)
 endfunction
 
