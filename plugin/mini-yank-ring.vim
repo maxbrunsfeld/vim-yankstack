@@ -55,12 +55,12 @@ endfunction
 
 function! s:yank_ring_step_forwards()
   call s:yank_ring_push(getreg('"'))
-  call setreg('"', remove(s:yank_ring, -1))
+  call setreg('"', s:yank_ring_shift())
 endfunction
 
 function! s:yank_ring_step_backwards()
   call s:yank_ring_unshift(getreg('"'))
-  call setreg('"', remove(s:yank_ring, 0))
+  call setreg('"', s:yank_ring_pop()
 endfunction
 
 function! s:yank_ring_push(item)
