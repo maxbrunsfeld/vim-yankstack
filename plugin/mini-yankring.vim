@@ -1,139 +1,137 @@
 " TODO
 "
 " - after yanking in visual block mode, then moving the text from the original
-"   register to the yankring and back, the paste no longer comes out as a visual 
+"   register to the yankstack and back, the paste no longer comes out as a visual
 "   block paste.
-"   Are there some special characters in the string that indicate that it was
+"   Are there some special characters in the ststack that indicate that it was
 "   yanked in visual block mode, and which need to be preserved?
 "
-" - buggy behavior when trying to substitute pastes from the yankring when
-"   the last command wasn't a paste
+" - when pasting in visual mode (overwriting text), the yank_stack
+"   doesn't work
+"
+" - for every new paste, the yank stack should start at the latest yank
 
-let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C']
+let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
 let s:paste_keys = ['p', 'P']
 
-if !exists('s:yank_ring')
-  let s:yank_ring = []
+if !exists('s:yank_stack')
+  let s:yank_stack = []
 endif
-if !exists('s:yank_ring_max')
-  let s:yank_ring_max = 50
+if !exists('s:yank_stack_max')
+  let s:yank_stack_max = 50
+endif
+if !exists('s:last_paste')
+  let s:last_paste = { 'parent_undo_number': -1 }
 endif
 
-function! g:yank_ring()
-  return [getreg('"')] + s:yank_ring
-endfunction
-
-function! g:yank_ring_max(...)
-  if a:0 > 0
-    let s:yank_ring_max = max([a:1, 1])
-    call s:yank_ring_truncate()
+function! g:yank_stack(...)
+  let list = [getreg('"')] + s:yank_stack
+  if a:0 == 0
+    return list
+  else
+    let index = a:1 % len(list)
+    return list[index]
   endif
-  return s:yank_ring_max
 endfunction
 
-function! s:yank_ring_push_last_yank_and_return_argument(input)
+function! g:yank_stack_max(...)
+  if a:0 > 0
+    let s:yank_stack_max = max([a:1, 1])
+    call s:yank_stack_truncate()
+  endif
+  return s:yank_stack_max
+endfunction
+
+function! g:yank_stack_last_paste()
+  return s:last_paste
+endfunction
+
+function! s:push_last_yank_and_return(input)
   let last_yank = getreg('"')
-  call s:yank_ring_push(last_yank)
-  call s:yank_ring_truncate()
+  call s:yank_stack_push(last_yank)
+  call s:yank_stack_truncate()
   return a:input
 endfunction
 
-function! s:yank_ring_substitute_older_paste()
-  for paste_key in s:paste_keys
-    if s:last_change_was_equivalent_to_normal(paste_key)
-      echo 'Last change was' paste_key
-      exec "silent undo"
-      call s:yank_ring_step_backwards()
-      exec 'normal!' paste_key
-      return
-    endif
-  endfor
-  echo 'Last change was not a paste'
-endfunction
-
-function! s:yank_ring_substitute_newer_paste()
-  for paste_key in s:paste_keys
-    if s:last_change_was_equivalent_to_normal(paste_key)
-      echo 'Last change was' paste_key
-      exec "silent undo"
-      call s:yank_ring_step_forwards()
-      exec 'normal!' paste_key
-      return
-    endif
-  endfor
-  echo 'Last change was not a paste'
-endfunction
-
-function! s:yank_ring_step_forwards()
-  call s:yank_ring_push(getreg('"'))
-  call setreg('"', s:yank_ring_shift())
-endfunction
-
-function! s:yank_ring_step_backwards()
-  call s:yank_ring_unshift(getreg('"'))
-  call setreg('"', s:yank_ring_pop()
-endfunction
-
-function! s:yank_ring_push(item)
-  let item_is_new = (len(a:item) > 0) && (len(s:yank_ring) == 0 || a:item != s:yank_ring[-1])
-  if item_is_new
-    call insert(s:yank_ring, a:item)
-  endif
-endfunction
-
-function! s:yank_ring_unshift(item)
-  let item_is_new = (len(a:item) > 0) && (len(s:yank_ring) == 0 || a:item != s:yank_ring[-1])
-  if item_is_new
-    call add(s:yank_ring, a:item)
-  endif
-endfunction
-
-function! s:yank_ring_pop()
-  return remove(s:yank_ring, 0)
-endfunction
-
-function! s:yank_ring_shift()
-  return remove(s:yank_ring, -1)
-endfunction
-
-function! s:yank_ring_truncate()
-  let s:yank_ring = s:yank_ring[: s:yank_ring_max-1]
-endfunction
-
-function! s:last_change_was_equivalent_to_normal(input)
-  let current_position = getpos('.')
+function! s:record_new_paste_and_return(input)
   let current_undo_number = undotree()['seq_cur']
-  exec "silent undo"
-  exec 'normal!' a:input
-  let change_line = line('.')
-  let change_text = getline(change_line-2, change_line+2)
-  exec 'silent undo' current_undo_number
-  call setpos('.', current_position)
-  let current_line = line('.')
-  let current_text = getline(change_line-2, change_line+2)
-  return (current_line == change_line) && (current_text == change_text)
+  let s:last_paste = {
+        \ 'parent_undo_number': current_undo_number,
+        \ 'paste_key': a:input,
+        \ 'stack_index': 0
+        \  }
+  return a:input
+endfunction
+
+function! s:yank_stack_substitute_older_paste()
+  let [save_cursor, save_register] = [getpos('.'), getreg('"')]
+  silent undo
+  if undotree()['seq_cur'] == s:last_paste['parent_undo_number']
+    let s:last_paste['stack_index'] += 1
+    call setreg('"', g:yank_stack(s:last_paste['stack_index']))
+    silent 'normal!' s:last_paste['paste_key']
+    call setreg('"', save_register)
+  else
+    echo 'Last change was not a paste'
+    silent redo
+    call setpos('.', save_cursor)
+  endif
+endfunction
+
+function! s:yank_stack_substitute_newer_paste()
+  let save_cursor = getpos('.')
+  silent undo
+  if undotree()['seq_cur'] == s:last_paste['parent_undo_number']
+    let save_register = getreg('"')
+    let s:last_paste['stack_index'] -= 1
+    call setreg('"', g:yank_stack(s:last_paste['stack_index']))
+    exec 'normal!' s:last_paste['paste_key']
+    call setreg('"', save_register)
+  else
+    echo 'Last change was not a paste'
+    silent redo
+    call setpos('.', save_cursor)
+  endif
+endfunction
+
+function! s:yank_stack_push(item)
+  let item_is_new = !empty(a:item) && empty(s:yank_stack) || (a:item != s:yank_stack[0])
+  if item_is_new
+    call insert(s:yank_stack, a:item)
+  endif
+endfunction
+
+function! s:yank_stack_truncate()
+  let s:yank_stack = s:yank_stack[: s:yank_stack_max-1]
 endfunction
 
 for s:yank_key in s:yank_keys
-  exec 'noremap <expr> <Plug>yank_ring_'. s:yank_key '<SID>yank_ring_push_last_yank_and_return_argument("'. s:yank_key .'")'
+  exec 'noremap <expr> <Plug>yank_stack_'. s:yank_key '<SID>push_last_yank_and_return("'. s:yank_key .'")'
 endfor
-nnoremap <silent> <Plug>yank_ring_substitute_older_paste :call <SID>yank_ring_substitute_older_paste()<CR>
-nnoremap <silent> <Plug>yank_ring_substitute_newer_paste :call <SID>yank_ring_substitute_newer_paste()<CR>
-inoremap <silent> <Plug>yank_ring_substitute_older_paste <C-o>:call <SID>yank_ring_substitute_older_paste()<CR>
-inoremap <silent> <Plug>yank_ring_substitute_newer_paste <C-o>:call <SID>yank_ring_substitute_newer_paste()<CR>
+for s:paste_key in s:paste_keys
+  exec 'noremap <expr> <Plug>yank_stack_'. s:paste_key '<SID>record_new_paste_and_return("'. s:paste_key .'")'
+endfor
 
-if !exists('s:yank_ring_map_keys')
-  let s:yank_ring_map_keys = 1
+nnoremap <silent> <Plug>yank_stack_substitute_older_paste :call <SID>yank_stack_substitute_older_paste()<CR>
+nnoremap <silent> <Plug>yank_stack_substitute_newer_paste :call <SID>yank_stack_substitute_newer_paste()<CR>
+inoremap <silent> <Plug>yank_stack_substitute_older_paste <C-o>:call <SID>yank_stack_substitute_older_paste()<CR>
+inoremap <silent> <Plug>yank_stack_substitute_newer_paste <C-o>:call <SID>yank_stack_substitute_newer_paste()<CR>
+
+if !exists('s:yank_stack_map_keys')
+  let s:yank_stack_map_keys = 1
 endif
 
-if s:yank_ring_map_keys
-  for s:yank_key in s:yank_keys
-    exec 'map' s:yank_key '<Plug>yank_ring_'. s:yank_key
+if s:yank_stack_map_keys
+  for s:paste_key in s:paste_keys
+    exec 'map' s:paste_key '<Plug>yank_stack_'. s:paste_key
   endfor
-  nmap [p <Plug>yank_ring_substitute_older_paste
-  nmap ]p <Plug>yank_ring_substitute_newer_paste
+  for s:yank_key in s:yank_keys
+    exec 'map' s:yank_key '<Plug>yank_stack_'. s:yank_key
+  endfor
+  map [p <Plug>yank_stack_substitute_older_paste
+  map ]p <Plug>yank_stack_substitute_newer_paste
+  imap <M-y> <Plug>yank_stack_substitute_older_paste
+  imap <M-Y> <Plug>yank_stack_substitute_newer_paste
   inoremap <C-y> <C-g>u<C-r>"
-  imap <M-y> <Plug>yank_ring_substitute_older_paste
-  imap <M-Y> <Plug>yank_ring_substitute_newer_paste
 endif
 
