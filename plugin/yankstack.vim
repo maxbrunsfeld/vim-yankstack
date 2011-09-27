@@ -7,13 +7,13 @@
 " - after yanking in visual block mode, then moving the text from the original
 "   register to the yankstack and back, the paste no longer comes out as a visual
 "   block paste.
-"   Are there some special characters in the ststack that indicate that it was
+"   Are there some special characters in the text that indicate that it was
 "   yanked in visual block mode, and which need to be preserved?
 
 if !exists('s:yank_stack') || !exists('g:yank_stack_size') || !exists('s:last_paste')
   let s:yank_stack = []
-  let g:yank_stack_size = 50
-  let s:last_paste = { 'parent_undo_number': -1 }
+  let g:yank_stack_size = 30
+  let s:last_paste = { 'undo_number': -1 }
 endif
 
 function! g:yank_stack(...)
@@ -32,7 +32,7 @@ function! s:substitute_paste(index_delta)
     let save_register = getreg('"')
     let s:last_paste.stack_index += a:index_delta
     call setreg('"', g:yank_stack(s:last_paste.stack_index))
-    silent exec 'normal!' s:last_paste.paste_key
+    silent exec 'normal!' (s:last_paste.mode == 'i' ? 'a' : '') . s:last_paste.paste_key
     call setreg('"', save_register)
     let s:last_paste.undo_number = s:get_current_undo_number()
     echo 'stack index:' s:last_paste.stack_index
@@ -41,19 +41,30 @@ function! s:substitute_paste(index_delta)
   endif
 endfunction
 
-function! s:save_last_yank_and_return(input)
+function! s:yank_with_key(input)
   call s:yank_stack_add(getreg('"'))
   return a:input
 endfunction
 
-function! s:save_new_paste_and_return(input)
-  " call s:yank_stack_add(getreg('"'))
+function! s:paste_with_key(keys)
   let s:last_paste = {
         \ 'undo_number': s:get_next_undo_number(),
-        \ 'paste_key': a:input,
-        \ 'stack_index': 0
+        \ 'paste_key': a:keys,
+        \ 'stack_index': 0,
+        \ 'mode': 'n'
         \ }
-  return a:input
+  return a:keys
+endfunction
+
+function! s:insert_mode_paste_with_key(keys)
+  " let save_autoindent = &autoindent
+  let s:last_paste = {
+        \ 'undo_number': s:get_next_undo_number(),
+        \ 'paste_key': a:keys,
+        \ 'stack_index': 0,
+        \ 'mode': 'i'
+        \ }
+  return a:keys
 endfunction
 
 function! s:get_next_undo_number()
@@ -87,14 +98,13 @@ endfunction
 
 let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
 let s:paste_keys = ['p', 'P']
-
 for s:yank_key in s:yank_keys
-  exec 'noremap <expr> <Plug>yank_stack_'. s:yank_key '<SID>save_last_yank_and_return("'. s:yank_key .'")'
+  exec 'noremap <expr> <Plug>yank_stack_'. s:yank_key '<SID>yank_with_key("'. s:yank_key .'")'
 endfor
 for s:paste_key in s:paste_keys
-  exec 'noremap <expr> <Plug>yank_stack_'. s:paste_key '<SID>save_new_paste_and_return("'. s:paste_key .'")'
+  exec 'noremap <expr> <Plug>yank_stack_'. s:paste_key '<SID>paste_with_key("'. s:paste_key .'")'
 endfor
-inoremap <expr>   <Plug>yank_stack_insert_mode_paste      <SID>save_new_paste_and_return('<C-g>u<C-r>"')
+inoremap <expr>   <Plug>yank_stack_insert_mode_paste      <SID>insert_mode_paste_with_key('<C-g>u<C-r>"')
 nnoremap <silent> <Plug>yank_stack_substitute_older_paste :call <SID>substitute_paste(1)<CR>
 nnoremap <silent> <Plug>yank_stack_substitute_newer_paste :call <SID>substitute_paste(-1)<CR>
 inoremap <silent> <Plug>yank_stack_substitute_older_paste <C-o>:call <SID>substitute_paste(1)<CR>
