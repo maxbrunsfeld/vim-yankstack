@@ -13,9 +13,13 @@ just clone this repo into your ```bundle``` directory.
 ## Configuration ##
 
 This plugin defines four main commands, with the following default mappings:
+
 - ```[p - yankstack_substitute_older_paste```
+
 - ```[P - yankstack_substitute_oldest_paste```
+
 - ```]p - yankstack_substitute_newer_paste```
+
 - ```]P - yankstack_substitute_newest_paste```
 
 After pasting some text using ```p``` or ```P```, you can cycle through your yank history using these commands.
