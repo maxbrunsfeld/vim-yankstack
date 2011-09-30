@@ -29,20 +29,19 @@ function! g:yankstack(...)
 endfunction
 
 function! s:substitute_paste(offset)
-  if s:get_current_undo_number() == s:last_paste.undo_number
-    silent undo
-    if a:offset == 'newest'
-      let s:last_paste.index = 0
-    elseif a:offset == 'oldest'
-      let s:last_paste.index = len(s:yankstack)
-    else
-      let s:last_paste.index += a:offset
-    endif
-    call s:paste_from_yankstack()
-    echo 'Yank-stack index:' s:last_paste.index
-  else
+  if s:get_current_undo_number() != s:last_paste.undo_number
     echo 'Last change was not a paste'
   endif
+  silent undo
+  if a:offset == 'newest'
+    let s:last_paste.index = 0
+  elseif a:offset == 'oldest'
+    let s:last_paste.index = len(s:yankstack)
+  else
+    let s:last_paste.index += a:offset
+  endif
+  call s:paste_from_yankstack()
+  echo 'Yank-stack index:' s:last_paste.index
 endfunction
 
 function! s:paste_from_yankstack()
@@ -66,21 +65,19 @@ function! s:yank_with_key(...)
   return keys
 endfunction
 
-function! s:paste_with_key(...)
-  let keys = a:1
-  let mode = (a:0 > 1) ? a:2 : 'n'
+function! s:paste_with_key(keys, mode)
   let index = 0
-  if mode == 'v'
+  if a:mode == 'v'
     call s:yankstack_add(@@)
     let index = 1
   endif
   let s:last_paste = {
     \ 'undo_number': s:get_next_undo_number(),
-    \ 'keys': keys,
+    \ 'keys': a:keys,
     \ 'index': index,
-    \ 'mode': mode
+    \ 'mode': a:mode
     \ }
-  return keys
+  return a:keys
 endfunction
 
 function! s:get_next_undo_number()
