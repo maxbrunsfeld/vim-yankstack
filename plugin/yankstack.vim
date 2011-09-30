@@ -1,15 +1,14 @@
 "
 " TODO
 "
-" - when in visual mode, pasting should also add the last yank to the stack,
-"   because the default register will get overwritten by the text that is
-"   pasted over.
-"
 " - after yanking in visual block mode, then moving the text from the original
 "   register to the yankstack and back, the paste no longer comes out as a visual
 "   block paste. Are there some special characters in the text that indicate that it
 "   was yanked in visual block mode, which are not preserved when copying the
 "   string?
+"
+" - display the correct stack index in the echo message (acount for wrapping
+"   around to the top of the stack)
 "
 
 if !exists('s:yankstack') || !exists('g:yankstack_size') || !exists('s:last_paste')
