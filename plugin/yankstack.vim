@@ -7,8 +7,9 @@
 "
 " - after yanking in visual block mode, then moving the text from the original
 "   register to the yankstack and back, the paste no longer comes out as a visual
-"   block paste. Are there some special characters in the text that indicate that it was
-"   yanked in visual block mode, and which need to be preserved?
+"   block paste. Are there some special characters in the text that indicate that it
+"   was yanked in visual block mode, which are not preserved when copying the
+"   string?
 "
 
 if !exists('s:yankstack') || !exists('g:yankstack_size') || !exists('s:last_paste')
@@ -47,9 +48,15 @@ endfunction
 function! s:paste_from_yankstack()
   let [save_register, save_autoindent] = [@@, &autoindent]
   let [@@, &autoindent] = [g:yankstack(s:last_paste.index), 0]
+  let s:last_paste.undo_number = s:get_next_undo_number()
   let command = (s:last_paste.mode == 'i') ? 'normal! a' : 'normal! '
-  silent exec command . s:last_paste.keys
-  let s:last_paste.undo_number = s:get_current_undo_number()
+  if s:last_paste.mode == 'i'
+    silent exec 'normal! a'  . s:last_paste.keys
+  elseif s:last_paste.mode == 'v'
+    silent exec 'normal! gv' . s:last_paste.keys
+  else
+    silent exec 'normal! '   . s:last_paste.keys
+  endif
   let [@@, &autoindent] = [save_register, save_autoindent]
 endfunction
 
@@ -62,12 +69,17 @@ endfunction
 function! s:paste_with_key(...)
   let keys = a:1
   let mode = (a:0 > 1) ? a:2 : 'n'
+  let index = 0
+  if mode == 'v'
+    call s:yankstack_add(@@)
+    let index = 1
+  endif
   let s:last_paste = {
-        \ 'undo_number': s:get_next_undo_number(),
-        \ 'keys': keys,
-        \ 'index': 0,
-        \ 'mode': mode
-        \ }
+    \ 'undo_number': s:get_next_undo_number(),
+    \ 'keys': keys,
+    \ 'index': index,
+    \ 'mode': mode
+    \ }
   return keys
 endfunction
 
@@ -100,12 +112,12 @@ function! s:yankstack_add(item)
   let s:yankstack = s:yankstack[: g:yankstack_size-1]
 endfunction
 
-nnoremap <silent> <Plug>yankstack_substitute_oldest_paste :call <SID>substitute_paste('oldest')<CR>
-nnoremap <silent> <Plug>yankstack_substitute_newest_paste :call <SID>substitute_paste('newest')<CR>
 nnoremap <silent> <Plug>yankstack_substitute_older_paste  :call <SID>substitute_paste(1)<CR>
-nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :call <SID>substitute_paste(-1)<CR>
 inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:call <SID>substitute_paste(1)<CR>
+nnoremap <silent> <Plug>yankstack_substitute_oldest_paste :call <SID>substitute_paste('oldest')<CR>
+nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :call <SID>substitute_paste(-1)<CR>
 inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:call <SID>substitute_paste(-1)<CR>
+nnoremap <silent> <Plug>yankstack_substitute_newest_paste :call <SID>substitute_paste('newest')<CR>
 inoremap <expr>   <Plug>yankstack_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'i')
 
 if !exists('g:yankstack_map_keys')
@@ -119,7 +131,8 @@ if g:yankstack_map_keys
     exec 'noremap <expr>' s:yank_key '<SID>yank_with_key("' . s:yank_key . '")'
   endfor
   for s:paste_key in s:paste_keys
-    exec 'noremap <expr>' s:paste_key '<SID>paste_with_key("'. s:paste_key .'")'
+    exec 'nnoremap <expr>' s:paste_key '<SID>paste_with_key("'. s:paste_key .'", "n")'
+    exec 'vnoremap <expr>' s:paste_key '<SID>paste_with_key("'. s:paste_key .'", "v")'
   endfor
   nmap [p    <Plug>yankstack_substitute_older_paste
   nmap [P    <Plug>yankstack_substitute_oldest_paste
