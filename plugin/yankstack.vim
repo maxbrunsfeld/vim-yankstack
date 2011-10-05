@@ -1,14 +1,14 @@
 "
 " TODO
 "
-" - after yanking in visual block mode, then moving the text from the original
-"   register to the yankstack and back, the paste no longer comes out as a visual
-"   block paste. Are there some special characters in the text that indicate that it
-"   was yanked in visual block mode, which are not preserved when copying the
-"   string?
-"
 " - display the correct stack index in the echo message (acount for wrapping
 "   around to the top of the stack)
+"
+" - support repeat.vim
+"
+" - when yanking in visual block mode, store a flag with the yanked text
+"   that it was a blockwise yank. then, when that text is pasted, use setreg
+"   with the 'b' option to make the paste work blockwise.
 "
 
 if !exists('s:yankstack') || !exists('g:yankstack_size') || !exists('s:last_paste')
@@ -32,14 +32,17 @@ function! s:substitute_paste(offset)
     echo 'Last change was not a paste'
   endif
   silent undo
-  if a:offset == 'newest'
-    let s:last_paste.index = 0
-  elseif a:offset == 'oldest'
-    let s:last_paste.index = len(s:yankstack)
-  else
-    let s:last_paste.index += a:offset
-  endif
+  call s:move_stack_index(a:offset)
   call s:paste_from_yankstack()
+endfunction
+
+function! s:move_stack_index(offset)
+  let s:last_paste.index += a:offset
+  if a:offset == 'newest' || s:last_paste.index < 0
+    let s:last_paste.index = 0
+  elseif a:offset == 'oldest' || s:last_paste.index >= len(g:yankstack())
+    let s:last_paste.index = len(g:yankstack())-1
+  endif
   echo 'Yank-stack index:' s:last_paste.index
 endfunction
 
