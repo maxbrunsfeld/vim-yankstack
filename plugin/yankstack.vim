@@ -52,11 +52,11 @@ function! s:paste_from_yankstack()
   let s:last_paste.undo_number = s:get_next_undo_number()
   let command = (s:last_paste.mode == 'i') ? 'normal! a' : 'normal! '
   if s:last_paste.mode == 'i'
-    silent exec 'normal! a'  . s:last_paste.keys
+    silent exec 'normal! a' . s:last_paste.key
   elseif s:last_paste.mode == 'v'
-    silent exec 'normal! gv' . s:last_paste.keys
+    silent exec 'normal! gv' . s:last_paste.key
   else
-    silent exec 'normal! '   . s:last_paste.keys
+    silent exec 'normal!' s:last_paste.key
   endif
   let [@@, &autoindent] = [save_register, save_autoindent]
 endfunction
@@ -66,7 +66,7 @@ function! s:yank_with_key(key)
   return a:key
 endfunction
 
-function! s:paste_with_key(keys, mode)
+function! s:paste_with_key(key, mode)
   let index = 0
   if a:mode == 'v'
     call s:yankstack_add(@@)
@@ -74,11 +74,11 @@ function! s:paste_with_key(keys, mode)
   endif
   let s:last_paste = {
     \ 'undo_number': s:get_next_undo_number(),
-    \ 'keys': a:keys,
+    \ 'key': a:key,
     \ 'index': index,
     \ 'mode': a:mode
     \ }
-  return a:keys
+  return a:key
 endfunction
 
 function! s:get_next_undo_number()
@@ -128,8 +128,8 @@ for s:key in s:yank_keys
   exec 'noremap <expr> <Plug>yankstack_' . s:key '<SID>yank_with_key("' . s:key . '")'
 endfor
 for s:key in s:paste_keys
-  exec 'nnoremap <expr> <Plug>yankstack' . s:key '<SID>paste_with_key("'. s:key .'", "n")'
-  exec 'vnoremap <expr> <Plug>yankstack' . s:key '<SID>paste_with_key("'. s:key .'", "v")'
+  exec 'nnoremap <expr> <Plug>yankstack_' . s:key '<SID>paste_with_key("' . s:key . '", "n")'
+  exec 'vnoremap <expr> <Plug>yankstack_' . s:key '<SID>paste_with_key("' . s:key . '", "v")'
 endfor
 
 if g:yankstack_map_keys
