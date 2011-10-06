@@ -118,10 +118,6 @@ inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:call <SID>substi
 nnoremap <silent> <Plug>yankstack_substitute_newest_paste :call <SID>substitute_paste('newest')<CR>
 inoremap <expr>   <Plug>yankstack_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'i')
 
-if !exists('g:yankstack_map_keys')
-  let g:yankstack_map_keys = 1
-endif
-
 let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
 let s:paste_keys = ['p', 'P']
 for s:key in s:yank_keys
@@ -131,6 +127,10 @@ for s:key in s:paste_keys
   exec 'nnoremap <expr> <Plug>yankstack_' . s:key '<SID>paste_with_key("' . s:key . '", "n")'
   exec 'vnoremap <expr> <Plug>yankstack_' . s:key '<SID>paste_with_key("' . s:key . '", "v")'
 endfor
+
+if !exists('g:yankstack_map_keys')
+  let g:yankstack_map_keys = 1
+endif
 
 if g:yankstack_map_keys
   for s:key in s:yank_keys
