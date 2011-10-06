@@ -61,10 +61,9 @@ function! s:paste_from_yankstack()
   let [@@, &autoindent] = [save_register, save_autoindent]
 endfunction
 
-function! s:yank_with_key(...)
-  let keys = a:1
+function! s:yank_with_key(key)
   call s:yankstack_add(@@)
-  return keys
+  return a:key
 endfunction
 
 function! s:paste_with_key(keys, mode)
@@ -123,15 +122,22 @@ if !exists('g:yankstack_map_keys')
   let g:yankstack_map_keys = 1
 endif
 
+let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
+let s:paste_keys = ['p', 'P']
+for s:key in s:yank_keys
+  exec 'noremap <expr> <Plug>yankstack_' . s:key '<SID>yank_with_key("' . s:key . '")'
+endfor
+for s:key in s:paste_keys
+  exec 'nnoremap <expr> <Plug>yankstack' . s:key '<SID>paste_with_key("'. s:key .'", "n")'
+  exec 'vnoremap <expr> <Plug>yankstack' . s:key '<SID>paste_with_key("'. s:key .'", "v")'
+endfor
+
 if g:yankstack_map_keys
-  let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
-  let s:paste_keys = ['p', 'P']
-  for s:yank_key in s:yank_keys
-    exec 'noremap <expr>' s:yank_key '<SID>yank_with_key("' . s:yank_key . '")'
+  for s:key in s:yank_keys
+    exec 'map' s:key '<Plug>yankstack_' . s:key
   endfor
-  for s:paste_key in s:paste_keys
-    exec 'nnoremap <expr>' s:paste_key '<SID>paste_with_key("'. s:paste_key .'", "n")'
-    exec 'vnoremap <expr>' s:paste_key '<SID>paste_with_key("'. s:paste_key .'", "v")'
+  for s:key in s:paste_keys
+    exec 'map' s:key '<Plug>yankstack_' . s:key
   endfor
   nmap [p    <Plug>yankstack_substitute_older_paste
   nmap [P    <Plug>yankstack_substitute_oldest_paste
