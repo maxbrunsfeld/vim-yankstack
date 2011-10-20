@@ -1,9 +1,6 @@
 "
 " TODO
 "
-" - display the correct stack index in the echo message (acount for wrapping
-"   around to the top of the stack)
-"
 " - support repeat.vim
 "
 " - when yanking in visual block mode, store a flag with the yanked text
