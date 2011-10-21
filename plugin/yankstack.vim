@@ -104,7 +104,7 @@ for s:key in s:yank_keys
 endfor
 for s:key in s:paste_keys
   exec 'nnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "n")'
-  exec 'vnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "v")'
+  exec 'xnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "v")'
 endfor
 
 if !exists('g:yanklist_map_keys') || g:yanklist_map_keys
