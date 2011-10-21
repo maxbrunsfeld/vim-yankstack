@@ -22,6 +22,7 @@ endfunction
 function! s:paste_with_key(key, mode)
   if a:mode == 'v'
     call s:yanklist_add(@@)
+    call s:yanklist_rotate(1)
   endif
   let s:last_paste = { 'undo_number': s:get_next_undo_number(), 'key': a:key, 'mode': a:mode }
   return a:key
@@ -106,11 +107,7 @@ for s:key in s:paste_keys
   exec 'vnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "v")'
 endfor
 
-if !exists('g:yanklist_map_keys')
-  let g:yanklist_map_keys = 1
-endif
-
-if g:yanklist_map_keys
+if !exists('g:yanklist_map_keys') || g:yanklist_map_keys
   for s:key in s:yank_keys + s:paste_keys
     exec 'map' s:key '<Plug>yanklist_' . s:key
   endfor
