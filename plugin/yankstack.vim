@@ -1,6 +1,10 @@
 "
 " TODO
 "
+" - support counts
+"
+" - make sure entries don't get unnecessarily repeated in the yank list
+"
 " - support repeat.vim
 "
 " - when yanking in visual block mode, store a flag with the yanked text
