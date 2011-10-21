@@ -14,14 +14,24 @@ if !exists('s:yankstack') || !exists('g:yankstack_size') || !exists('s:last_past
   let s:last_paste = { 'undo_number': -1 }
 endif
 
-function! g:yankstack(...)
-  let list = [@@] + s:yankstack
-  if a:0 == 0
-    return list
-  else
-    let index = a:1 % len(list)
-    return list[index]
-  end
+function! s:yank_with_key(key)
+  call s:yankstack_add(@@)
+  return a:key
+endfunction
+
+function! s:paste_with_key(key, mode)
+  let index = 0
+  if a:mode == 'v'
+    call s:yankstack_add(@@)
+    let index = 1
+  endif
+  let s:last_paste = {
+    \ 'undo_number': s:get_next_undo_number(),
+    \ 'key': a:key,
+    \ 'index': index,
+    \ 'mode': a:mode
+    \ }
+  return a:key
 endfunction
 
 function! s:substitute_paste(offset)
@@ -43,6 +53,14 @@ function! s:move_stack_index(offset)
   echo 'Yank-stack index:' s:last_paste.index
 endfunction
 
+function! s:yankstack_add(item)
+  let item_is_new = !empty(a:item) && empty(s:yankstack) || (a:item != s:yankstack[0])
+  if item_is_new
+    call insert(s:yankstack, a:item)
+  endif
+  let s:yankstack = s:yankstack[: g:yankstack_size-1]
+endfunction
+
 function! s:paste_from_yankstack()
   let [save_register, save_autoindent] = [@@, &autoindent]
   let [@@, &autoindent] = [g:yankstack(s:last_paste.index), 0]
@@ -56,26 +74,6 @@ function! s:paste_from_yankstack()
     silent exec 'normal!' s:last_paste.key
   endif
   let [@@, &autoindent] = [save_register, save_autoindent]
-endfunction
-
-function! s:yank_with_key(key)
-  call s:yankstack_add(@@)
-  return a:key
-endfunction
-
-function! s:paste_with_key(key, mode)
-  let index = 0
-  if a:mode == 'v'
-    call s:yankstack_add(@@)
-    let index = 1
-  endif
-  let s:last_paste = {
-    \ 'undo_number': s:get_next_undo_number(),
-    \ 'key': a:key,
-    \ 'index': index,
-    \ 'mode': a:mode
-    \ }
-  return a:key
 endfunction
 
 function! s:get_next_undo_number()
@@ -99,12 +97,14 @@ function! s:get_parent_undo_number()
   return entry.seq - 1
 endfunction
 
-function! s:yankstack_add(item)
-  let item_is_new = !empty(a:item) && empty(s:yankstack) || (a:item != s:yankstack[0])
-  if item_is_new
-    call insert(s:yankstack, a:item)
-  endif
-  let s:yankstack = s:yankstack[: g:yankstack_size-1]
+function! g:yankstack(...)
+  let list = [@@] + s:yankstack
+  if a:0 == 0
+    return list
+  else
+    let index = a:1 % len(list)
+    return list[index]
+  end
 endfunction
 
 nnoremap <silent> <Plug>yankstack_substitute_older_paste  :call <SID>substitute_paste(1)<CR>
