@@ -35,9 +35,9 @@ endfunction
 
 function! s:move_stack_index(offset)
   let s:last_paste.index += a:offset
-  if a:offset == 'newest' || s:last_paste.index < 0
+  if s:last_paste.index < 0
     let s:last_paste.index = 0
-  elseif a:offset == 'oldest' || s:last_paste.index >= len(g:yankstack())
+  elseif s:last_paste.index >= len(g:yankstack())
     let s:last_paste.index = len(g:yankstack())-1
   endif
   echo 'Yank-stack index:' s:last_paste.index
@@ -109,10 +109,8 @@ endfunction
 
 nnoremap <silent> <Plug>yankstack_substitute_older_paste  :call <SID>substitute_paste(1)<CR>
 inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:call <SID>substitute_paste(1)<CR>
-nnoremap <silent> <Plug>yankstack_substitute_oldest_paste :call <SID>substitute_paste('oldest')<CR>
 nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :call <SID>substitute_paste(-1)<CR>
 inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:call <SID>substitute_paste(-1)<CR>
-nnoremap <silent> <Plug>yankstack_substitute_newest_paste :call <SID>substitute_paste('newest')<CR>
 inoremap <expr>   <Plug>yankstack_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'i')
 
 let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
@@ -137,9 +135,7 @@ if g:yankstack_map_keys
     exec 'map' s:key '<Plug>yankstack_' . s:key
   endfor
   nmap [p    <Plug>yankstack_substitute_older_paste
-  nmap [P    <Plug>yankstack_substitute_oldest_paste
   nmap ]p    <Plug>yankstack_substitute_newer_paste
-  nmap ]P    <Plug>yankstack_substitute_newest_paste
   imap <M-y> <Plug>yankstack_substitute_older_paste
   imap <M-Y> <Plug>yankstack_substitute_newer_paste
   imap <C-y> <Plug>yankstack_insert_mode_paste
