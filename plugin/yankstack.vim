@@ -31,6 +31,7 @@ endfunction
 function! s:substitute_paste(offset)
   if s:get_current_undo_number() != s:last_paste.undo_number
     echo 'Last change was not a paste'
+    return
   endif
   silent undo
   call s:yanklist_rotate(a:offset)
