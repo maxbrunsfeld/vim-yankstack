@@ -14,7 +14,7 @@
 
 let s:yanklist = []
 let g:yanklist_size = 30
-let s:last_paste = { 'undo_number': -1 }
+let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'n' }
 
 function! s:yank_with_key(key)
   call s:yanklist_add(@@)
