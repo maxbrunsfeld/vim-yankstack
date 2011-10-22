@@ -12,11 +12,9 @@
 "   with the 'b' option to make the paste work blockwise.
 "
 
-if !exists('s:yanklist') || !exists('g:yanklist_size') || !exists('s:last_paste')
-  let s:yanklist = []
-  let g:yanklist_size = 30
-  let s:last_paste = { 'undo_number': -1 }
-endif
+let s:yanklist = []
+let g:yanklist_size = 30
+let s:last_paste = { 'undo_number': -1 }
 
 function! s:yank_with_key(key)
   call s:yanklist_add(@@)
