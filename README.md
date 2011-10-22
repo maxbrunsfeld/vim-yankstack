@@ -15,11 +15,21 @@ just clone this repo into your ```bundle``` directory.
 
 ## Configuration ##
 
-This plugin defines four main commands, with the following default mappings:
+Here are the mappings that this plugins defines.
 
-- ```[p - yankstack_substitute_older_paste```
+```unimpaired.vim```-style mappings in normal mode:
 
-- ```]p - yankstack_substitute_newer_paste```
+- ```[p (yankstack_substitute_older_paste)``` - cycle backward through the history of strings you've yanked
+
+- ```]p - (yankstack_substitute_newer_paste)``` - cycle forwards through the history of strings you've yanked
+
+emacs-style mappings in insert mode:
+
+- ```CTRL-y ``` - create an undo entry and paste (yankstack needs an undo entry to recognize pastes)
+
+- ```ALT-y``` - cycle backwards through the history of strings you've yanked
+
+- ```ALT-Y``` - cycle forwards through the history of strings you've yanked
 
 After pasting some text using ```p``` or ```P```, you can cycle through your yank history using these commands.
 
