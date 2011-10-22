@@ -55,11 +55,10 @@ function! s:yanklist_rotate(offset)
 endfunction
 
 function! s:yanklist_add(item)
-  let item_is_new = !empty(a:item) && empty(s:yanklist) || (a:item != s:yanklist[0])
-  if item_is_new
+  if !empty(a:item) && empty(s:yanklist) || (a:item != s:yanklist[0])
     call insert(s:yanklist, a:item)
+    let s:yanklist = s:yanklist[: g:yanklist_size]
   endif
-  let s:yanklist = s:yanklist[: g:yanklist_size]
 endfunction
 
 function! s:paste_from_yanklist()
