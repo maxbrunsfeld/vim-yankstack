@@ -112,7 +112,8 @@ endfor
 
 if !exists('g:yanklist_map_keys') || g:yanklist_map_keys
   for s:key in s:yank_keys + s:paste_keys
-    exec 'map' s:key '<Plug>yanklist_' . s:key
+    exec 'nmap' s:key '<Plug>yanklist_' . s:key
+    exec 'xmap' s:key '<Plug>yanklist_' . s:key
   endfor
   nmap [p    <Plug>yanklist_substitute_older_paste
   nmap ]p    <Plug>yanklist_substitute_newer_paste
