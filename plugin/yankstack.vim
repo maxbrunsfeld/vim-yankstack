@@ -102,7 +102,8 @@ inoremap <expr>   <Plug>yanklist_insert_mode_paste       <SID>paste_with_key('<C
 let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
 let s:paste_keys = ['p', 'P']
 for s:key in s:yank_keys
-  exec 'noremap <expr> <Plug>yanklist_' . s:key '<SID>yank_with_key("' . s:key . '")'
+  exec 'nnoremap <expr> <Plug>yanklist_' . s:key '<SID>yank_with_key("' . s:key . '")'
+  exec 'xnoremap <expr> <Plug>yanklist_' . s:key '<SID>yank_with_key("' . s:key . '")'
 endfor
 for s:key in s:paste_keys
   exec 'nnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "n")'
