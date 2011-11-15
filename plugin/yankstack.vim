@@ -17,13 +17,13 @@ let g:yanklist_size = 30
 let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'n' }
 
 function! s:yank_with_key(key)
-  call s:yanklist_add(@@)
+  call s:yanklist_add()
   return a:key
 endfunction
 
 function! s:paste_with_key(key, mode)
   if a:mode == 'v'
-    call s:yanklist_add(@@)
+    call s:yanklist_add()
     call s:yanklist_rotate(1)
   endif
   let s:last_paste = { 'undo_number': s:get_next_undo_number(), 'key': a:key, 'mode': a:mode }
@@ -41,20 +41,24 @@ function! s:substitute_paste(offset)
 endfunction
 
 function! s:yanklist_rotate(offset)
+  let [text, type] = [getreg('"'), getregtype('"')]
   if empty(s:yanklist)
     return
   elseif a:offset > 0
-    call add(s:yanklist, getreg('"'))
-    call setreg('"', remove(s:yanklist, 0))
+    let entry = remove(s:yanklist, 0)
+    call add(s:yanklist, { 'text': text, 'type': type })
+    call setreg('"', entry.text, entry.type)
   elseif a:offset < 0
-    call insert(s:yanklist, getreg('"'))
-    call setreg('"', remove(s:yanklist, -1))
+    let entry = remove(s:yanklist, -1)
+    call insert(s:yanklist, { 'text': text, 'type': type })
+    call setreg('"', entry.text, entry.type)
   endif
 endfunction
 
-function! s:yanklist_add(item)
-  if !empty(a:item) && empty(s:yanklist) || (a:item != s:yanklist[0])
-    call insert(s:yanklist, a:item)
+function! s:yanklist_add()
+  let [text, type] = [getreg('"'), getregtype('"')]
+  if !empty(text) && empty(s:yanklist) || (text != s:yanklist[0].text)
+    call insert(s:yanklist, { 'text': text, 'type': type })
     let s:yanklist = s:yanklist[: g:yanklist_size]
   endif
 endfunction
