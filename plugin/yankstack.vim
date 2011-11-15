@@ -7,10 +7,6 @@
 "
 " - support repeat.vim
 "
-" - when yanking in visual block mode, store a flag with the yanked text
-"   that it was a blockwise yank. then, when that text is pasted, use setreg
-"   with the 'b' option to make the paste work blockwise.
-"
 
 let s:yanklist = []
 let g:yanklist_size = 30
