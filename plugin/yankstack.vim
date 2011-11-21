@@ -12,6 +12,22 @@ let s:yanklist = []
 let g:yanklist_size = 30
 let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'n' }
 
+command! -nargs=0 Yanks call s:show_yanks()
+function! s:show_yanks()
+  echohl WarningMsg | echo "--- Yanks ---" | echohl None
+  let i = 0
+  echo s:format_yank(getreg('"'), i)
+  for yank in s:yanklist
+    let i += 1
+    echo s:format_yank(yank.text, i)
+  endfor
+endfunction
+
+function! s:format_yank(yank, i)
+  let line = printf("%-4d %s", a:i, a:yank)
+  return split(line, '\n')[0][: 80]
+endfunction
+
 function! s:yank_with_key(key)
   call s:yanklist_add()
   return a:key
