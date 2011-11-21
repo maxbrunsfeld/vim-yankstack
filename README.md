@@ -37,3 +37,6 @@ If you want to load yankstack without defining any of the default key mappings, 
 ``` let g:yankstack_map_keys = 0 ```
 in your .vimrc file.
 
+## Viewing the list of yanks ##
+
+You can see the contents of the yank-stack using the ```Yanks``` command.
