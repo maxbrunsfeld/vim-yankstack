@@ -16,7 +16,7 @@ command! -nargs=0 Yanks call s:show_yanks()
 function! s:show_yanks()
   echohl WarningMsg | echo "--- Yanks ---" | echohl None
   let i = 0
-  echo s:format_yank(getreg('"'), i)
+  echo s:format_yank(s:get_yanklist_head().text, i)
   for yank in s:yanklist
     let i += 1
     echo s:format_yank(yank.text, i)
@@ -52,25 +52,33 @@ function! s:substitute_paste(offset)
   call s:paste_from_yanklist()
 endfunction
 
+function! s:get_yanklist_head()
+  return { 'text': getreg('"'), 'type': getregtype('"') }
+endfunction
+
+function! s:set_yanklist_head(entry)
+  call setreg('"', a:entry.text, a:entry.type)
+endfunction
+
 function! s:yanklist_rotate(offset)
-  let [text, type] = [getreg('"'), getregtype('"')]
+  let head = s:get_yanklist_head()
   if empty(s:yanklist)
     return
   elseif a:offset > 0
     let entry = remove(s:yanklist, 0)
-    call add(s:yanklist, { 'text': text, 'type': type })
-    call setreg('"', entry.text, entry.type)
+    call add(s:yanklist, head)
+    call s:set_yanklist_head(entry)
   elseif a:offset < 0
     let entry = remove(s:yanklist, -1)
-    call insert(s:yanklist, { 'text': text, 'type': type })
-    call setreg('"', entry.text, entry.type)
+    call insert(s:yanklist, head)
+    call s:set_yanklist_head(entry)
   endif
 endfunction
 
-  let [text, type] = [getreg('"'), getregtype('"')]
-  if !empty(text) && empty(s:yanklist) || (text != s:yanklist[0].text)
-    call insert(s:yanklist, { 'text': text, 'type': type })
 function! s:yanklist_before_add()
+  let head = s:get_yanklist_head()
+  if !empty(head.text) && empty(s:yanklist) || (head != s:yanklist[0])
+    call insert(s:yanklist, head)
     let s:yanklist = s:yanklist[: g:yanklist_size]
   endif
 endfunction
