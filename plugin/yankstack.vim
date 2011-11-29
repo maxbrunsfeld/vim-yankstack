@@ -29,13 +29,13 @@ function! s:format_yank(yank, i)
 endfunction
 
 function! s:yank_with_key(key)
-  call s:yanklist_add()
+  call s:yanklist_before_add()
   return a:key
 endfunction
 
 function! s:paste_with_key(key, mode)
   if a:mode == 'v'
-    call s:yanklist_add()
+    call s:yanklist_before_add()
     call s:yanklist_rotate(1)
   endif
   let s:last_paste = { 'undo_number': s:get_next_undo_number(), 'key': a:key, 'mode': a:mode }
@@ -67,10 +67,10 @@ function! s:yanklist_rotate(offset)
   endif
 endfunction
 
-function! s:yanklist_add()
   let [text, type] = [getreg('"'), getregtype('"')]
   if !empty(text) && empty(s:yanklist) || (text != s:yanklist[0].text)
     call insert(s:yanklist, { 'text': text, 'type': type })
+function! s:yanklist_before_add()
     let s:yanklist = s:yanklist[: g:yanklist_size]
   endif
 endfunction
