@@ -10,7 +10,7 @@
 
 let s:yanklist = []
 let g:yanklist_size = 30
-let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'n' }
+let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'normal' }
 
 command! -nargs=0 Yanks call s:show_yanks()
 function! s:show_yanks()
@@ -34,7 +34,7 @@ function! s:yank_with_key(key)
 endfunction
 
 function! s:paste_with_key(key, mode)
-  if a:mode == 'v'
+  if a:mode == 'visual'
     call s:yanklist_before_add()
     call s:yanklist_rotate(1)
   endif
@@ -86,9 +86,9 @@ endfunction
 function! s:paste_from_yanklist()
   let [&autoindent, save_autoindent] = [0, &autoindent]
   let s:last_paste.undo_number = s:get_next_undo_number()
-  if s:last_paste.mode == 'i'
+  if s:last_paste.mode == 'insert'
     silent exec 'normal! a' . s:last_paste.key
-  elseif s:last_paste.mode == 'v'
+  elseif s:last_paste.mode == 'visual'
     silent exec 'normal! gv' . s:last_paste.key
   else
     silent exec 'normal!' s:last_paste.key
@@ -121,7 +121,7 @@ nnoremap <silent> <Plug>yanklist_substitute_older_paste  :call <SID>substitute_p
 inoremap <silent> <Plug>yanklist_substitute_older_paste  <C-o>:call <SID>substitute_paste(1)<CR>
 nnoremap <silent> <Plug>yanklist_substitute_newer_paste  :call <SID>substitute_paste(-1)<CR>
 inoremap <silent> <Plug>yanklist_substitute_newer_paste  <C-o>:call <SID>substitute_paste(-1)<CR>
-inoremap <expr>   <Plug>yanklist_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'i')
+inoremap <expr>   <Plug>yanklist_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'insert')
 
 let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
 let s:paste_keys = ['p', 'P']
@@ -130,8 +130,8 @@ for s:key in s:yank_keys
   exec 'xnoremap <expr> <Plug>yanklist_' . s:key '<SID>yank_with_key("' . s:key . '")'
 endfor
 for s:key in s:paste_keys
-  exec 'nnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "n")'
-  exec 'xnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "v")'
+  exec 'nnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "normal")'
+  exec 'xnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "visual")'
 endfor
 
 if !exists('g:yanklist_map_keys') || g:yanklist_map_keys
