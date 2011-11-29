@@ -61,18 +61,21 @@ function! s:set_yanklist_head(entry)
 endfunction
 
 function! s:yanklist_rotate(offset)
-  let head = s:get_yanklist_head()
-  if empty(s:yanklist)
-    return
-  elseif a:offset > 0
-    let entry = remove(s:yanklist, 0)
-    call add(s:yanklist, head)
+  if empty(s:yanklist) | return | endif
+  let offset_left = a:offset
+  while offset_left != 0
+    let head = s:get_yanklist_head()
+    if offset_left > 0
+      let entry = remove(s:yanklist, 0)
+      call add(s:yanklist, head)
+      let offset_left -= 1
+    elseif offset_left < 0
+      let entry = remove(s:yanklist, -1)
+      call insert(s:yanklist, head)
+      let offset_left += 1
+    endif
     call s:set_yanklist_head(entry)
-  elseif a:offset < 0
-    let entry = remove(s:yanklist, -1)
-    call insert(s:yanklist, head)
-    call s:set_yanklist_head(entry)
-  endif
+  endwhile
 endfunction
 
 function! s:yanklist_before_add()
