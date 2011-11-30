@@ -8,7 +8,7 @@
 " - support repeat.vim
 "
 
-let s:yanklist = []
+let s:yanklist_tail = []
 let g:yanklist_size = 30
 let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'normal' }
 
@@ -17,7 +17,7 @@ function! s:show_yanks()
   echohl WarningMsg | echo "--- Yanks ---" | echohl None
   let i = 0
   echo s:format_yank(s:get_yanklist_head().text, i)
-  for yank in s:yanklist
+  for yank in s:yanklist_tail
     let i += 1
     echo s:format_yank(yank.text, i)
   endfor
@@ -61,17 +61,17 @@ function! s:set_yanklist_head(entry)
 endfunction
 
 function! s:yanklist_rotate(offset)
-  if empty(s:yanklist) | return | endif
+  if empty(s:yanklist_tail) | return | endif
   let offset_left = a:offset
   while offset_left != 0
     let head = s:get_yanklist_head()
     if offset_left > 0
-      let entry = remove(s:yanklist, 0)
-      call add(s:yanklist, head)
+      let entry = remove(s:yanklist_tail, 0)
+      call add(s:yanklist_tail, head)
       let offset_left -= 1
     elseif offset_left < 0
-      let entry = remove(s:yanklist, -1)
-      call insert(s:yanklist, head)
+      let entry = remove(s:yanklist_tail, -1)
+      call insert(s:yanklist_tail, head)
       let offset_left += 1
     endif
     call s:set_yanklist_head(entry)
@@ -80,9 +80,9 @@ endfunction
 
 function! s:yanklist_before_add()
   let head = s:get_yanklist_head()
-  if !empty(head.text) && empty(s:yanklist) || (head != s:yanklist[0])
-    call insert(s:yanklist, head)
-    let s:yanklist = s:yanklist[: g:yanklist_size]
+  if !empty(head.text) && empty(s:yanklist_tail) || (head != s:yanklist_tail[0])
+    call insert(s:yanklist_tail, head)
+    let s:yanklist_tail = s:yanklist_tail[: g:yanklist_size]
   endif
 endfunction
 
