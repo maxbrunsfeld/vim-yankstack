@@ -3,6 +3,11 @@
 "
 " - support counts
 "
+" - pasting in visual mode should leave the yankstack in a more consistent
+"   state
+"
+" - preserve people's mappings of yank and paste keys
+"
 " - make sure entries don't get unnecessarily repeated in the yank list
 "
 " - support repeat.vim
