@@ -3,9 +3,6 @@
 "
 " - support counts
 "
-" - pasting in visual mode should leave the yankstack in a more consistent
-"   state
-"
 " - preserve people's mappings of yank and paste keys
 "
 " - make sure entries don't get unnecessarily repeated in the yank list
@@ -97,7 +94,9 @@ function! s:paste_from_yanklist()
   if s:last_paste.mode == 'insert'
     silent exec 'normal! a' . s:last_paste.key
   elseif s:last_paste.mode == 'visual'
+    let head = s:get_yanklist_head()
     silent exec 'normal! gv' . s:last_paste.key
+    call s:set_yanklist_head(head)
   else
     silent exec 'normal!' s:last_paste.key
   endif
