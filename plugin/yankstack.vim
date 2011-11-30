@@ -1,8 +1,6 @@
 "
 " TODO
 "
-" - support counts
-"
 " - preserve people's mappings of yank and paste keys
 "
 " - make sure entries don't get unnecessarily repeated in the yank list
@@ -124,10 +122,10 @@ function! s:format_yank(yank, i)
   return split(line, '\n')[0][: 80]
 endfunction
 
-nnoremap <silent> <Plug>yanklist_substitute_older_paste  :call <SID>substitute_paste(1)<CR>
-inoremap <silent> <Plug>yanklist_substitute_older_paste  <C-o>:call <SID>substitute_paste(1)<CR>
-nnoremap <silent> <Plug>yanklist_substitute_newer_paste  :call <SID>substitute_paste(-1)<CR>
-inoremap <silent> <Plug>yanklist_substitute_newer_paste  <C-o>:call <SID>substitute_paste(-1)<CR>
+nnoremap <silent> <Plug>yanklist_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
+nnoremap <silent> <Plug>yanklist_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>
+inoremap <silent> <Plug>yanklist_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1)<CR>
+inoremap <silent> <Plug>yanklist_substitute_newer_paste  <C-o>:<C-u>call <SID>substitute_paste(-v:count1)<CR>
 inoremap <expr>   <Plug>yanklist_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'insert')
 
 let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
