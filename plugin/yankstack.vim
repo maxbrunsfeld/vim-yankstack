@@ -14,22 +14,6 @@ let s:yanklist_tail = []
 let g:yanklist_size = 30
 let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'normal' }
 
-command! -nargs=0 Yanks call s:show_yanks()
-function! s:show_yanks()
-  echohl WarningMsg | echo "--- Yanks ---" | echohl None
-  let i = 0
-  echo s:format_yank(s:get_yanklist_head().text, i)
-  for yank in s:yanklist_tail
-    let i += 1
-    echo s:format_yank(yank.text, i)
-  endfor
-endfunction
-
-function! s:format_yank(yank, i)
-  let line = printf("%-4d %s", a:i, a:yank)
-  return split(line, '\n')[0][: 80]
-endfunction
-
 function! s:yank_with_key(key)
   call s:yanklist_before_add()
   return a:key
@@ -54,12 +38,12 @@ function! s:substitute_paste(offset)
   call s:paste_from_yanklist()
 endfunction
 
-function! s:get_yanklist_head()
-  return { 'text': getreg('"'), 'type': getregtype('"') }
-endfunction
-
-function! s:set_yanklist_head(entry)
-  call setreg('"', a:entry.text, a:entry.type)
+function! s:yanklist_before_add()
+  let head = s:get_yanklist_head()
+  if !empty(head.text) && (empty(s:yanklist_tail) || (head != s:yanklist_tail[0]))
+    call insert(s:yanklist_tail, head)
+    let s:yanklist_tail = s:yanklist_tail[: g:yanklist_size]
+  endif
 endfunction
 
 function! s:yanklist_rotate(offset)
@@ -80,14 +64,6 @@ function! s:yanklist_rotate(offset)
   endwhile
 endfunction
 
-function! s:yanklist_before_add()
-  let head = s:get_yanklist_head()
-  if !empty(head.text) && empty(s:yanklist_tail) || (head != s:yanklist_tail[0])
-    call insert(s:yanklist_tail, head)
-    let s:yanklist_tail = s:yanklist_tail[: g:yanklist_size]
-  endif
-endfunction
-
 function! s:paste_from_yanklist()
   let [&autoindent, save_autoindent] = [0, &autoindent]
   let s:last_paste.undo_number = s:get_next_undo_number()
@@ -101,6 +77,14 @@ function! s:paste_from_yanklist()
     silent exec 'normal!' s:last_paste.key
   endif
   let &autoindent = save_autoindent
+endfunction
+
+function! s:get_yanklist_head()
+  return { 'text': getreg('"'), 'type': getregtype('"') }
+endfunction
+
+function! s:set_yanklist_head(entry)
+  call setreg('"', a:entry.text, a:entry.type)
 endfunction
 
 function! s:get_next_undo_number()
@@ -122,6 +106,22 @@ function! s:get_parent_undo_number()
     let entry = entry.alt[0]
   endwhile
   return entry.seq - 1
+endfunction
+
+function! s:show_yanks()
+  echohl WarningMsg | echo "--- Yanks ---" | echohl None
+  let i = 0
+  echo s:format_yank(s:get_yanklist_head().text, i)
+  for yank in s:yanklist_tail
+    let i += 1
+    echo s:format_yank(yank.text, i)
+  endfor
+endfunction
+command! -nargs=0 Yanks call s:show_yanks()
+
+function! s:format_yank(yank, i)
+  let line = printf("%-4d %s", a:i, a:yank)
+  return split(line, '\n')[0][: 80]
 endfunction
 
 nnoremap <silent> <Plug>yanklist_substitute_older_paste  :call <SID>substitute_paste(1)<CR>
