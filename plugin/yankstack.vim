@@ -1,6 +1,11 @@
 "
 " TODO
 "
+" - make :Yanks command display number of lines in yank
+"
+" - investigate whether an s: variable is the best way to
+"   scope the yankstack_tail
+"
 " - support repeat.vim
 "
 
