@@ -1,10 +1,6 @@
 "
 " TODO
 "
-" - preserve people's mappings of yank and paste keys
-"
-" - make sure entries don't get unnecessarily repeated in the yank list
-"
 " - support repeat.vim
 "
 
