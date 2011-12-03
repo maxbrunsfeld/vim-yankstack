@@ -122,28 +122,29 @@ function! s:format_yank(yank, i)
   return split(line, '\n')[0][: 80]
 endfunction
 
+function! s:define_yank_and_paste_mappings()
+  let yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
+  let paste_keys = ['p', 'P']
+  for key in yank_keys
+    exec 'nnoremap <expr> <Plug>yanklist_' . key '<SID>yank_with_key("' . key . '")'
+    exec 'xnoremap <expr> <Plug>yanklist_' . key '<SID>yank_with_key("' . key . '")'
+  endfor
+  for key in paste_keys
+    exec 'nnoremap <expr> <Plug>yanklist_' . key '<SID>paste_with_key("' . key . '", "normal")'
+    exec 'xnoremap <expr> <Plug>yanklist_' . key '<SID>paste_with_key("' . key . '", "visual")'
+  endfor
+endfunction
+
+call s:define_yank_and_paste_mappings()
+call yankstack#map_yank_and_paste_keys()
+
 nnoremap <silent> <Plug>yanklist_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
 nnoremap <silent> <Plug>yanklist_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>
 inoremap <silent> <Plug>yanklist_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1)<CR>
 inoremap <silent> <Plug>yanklist_substitute_newer_paste  <C-o>:<C-u>call <SID>substitute_paste(-v:count1)<CR>
 inoremap <expr>   <Plug>yanklist_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'insert')
 
-let s:yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
-let s:paste_keys = ['p', 'P']
-for s:key in s:yank_keys
-  exec 'nnoremap <expr> <Plug>yanklist_' . s:key '<SID>yank_with_key("' . s:key . '")'
-  exec 'xnoremap <expr> <Plug>yanklist_' . s:key '<SID>yank_with_key("' . s:key . '")'
-endfor
-for s:key in s:paste_keys
-  exec 'nnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "normal")'
-  exec 'xnoremap <expr> <Plug>yanklist_' . s:key '<SID>paste_with_key("' . s:key . '", "visual")'
-endfor
-
 if !exists('g:yanklist_map_keys') || g:yanklist_map_keys
-  for s:key in s:yank_keys + s:paste_keys
-    exec 'nmap' s:key '<Plug>yanklist_' . s:key
-    exec 'xmap' s:key '<Plug>yanklist_' . s:key
-  endfor
   nmap [p    <Plug>yanklist_substitute_older_paste
   nmap ]p    <Plug>yanklist_substitute_newer_paste
   imap <M-y> <Plug>yanklist_substitute_older_paste
