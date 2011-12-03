@@ -1,5 +1,8 @@
+" yankstack.vim - keep track of your history of yanked/killed text
 "
-" TODO
+" Maintainer:   Max Brunsfeld <https://github.com/maxbrunsfeld>
+" Version:      1.0
+" Todo:
 "
 " - make :Yanks command display number of lines in yank
 "
