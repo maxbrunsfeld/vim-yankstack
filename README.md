@@ -13,9 +13,23 @@ This plugin is intended to be a simpler alternative to the [yankring](https://gi
 I recommend loading your plugins with [pathogen](https://github.com/tpope/vim-pathogen), so you can
 just clone this repo into your ```bundle``` directory.
 
+## Initialization ##
+
+Yankstack works by mapping the yank and paste keys to functions that do some book-keeping before
+calling through to the normal yank/paste keys. You may want to define your own mappings of the
+yank and paste keys. For example, I like to map the ```Y``` key to ```y$```, so that it behaves
+the same as ```D``` and ```C```. The yankstack mappings need to happen **before** you define any
+such mappings of your own. To achieve this, just call ```yankstack#define_yank_and_paste_mappings()```
+in your vimrc, before defining your mappings:
+
+```
+yankstack#define_yank_and_paste_mappings()
+nmap Y y$
+```
+
 ## Configuration ##
 
-Here are the mappings that this plugins defines.
+Here are the special mappings that this plugins defines.
 
 ```unimpaired.vim```-style mappings in normal mode:
 
@@ -40,3 +54,4 @@ in your .vimrc file.
 ## Viewing the list of yanks ##
 
 You can see the contents of the yank-stack using the ```Yanks``` command.
+
