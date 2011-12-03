@@ -105,8 +105,7 @@ endfunction
 function! s:show_yanks()
   echohl WarningMsg | echo "--- Yanks ---" | echohl None
   let i = 0
-  echo s:format_yank(s:get_yankstack_head().text, i)
-  for yank in s:yankstack_tail
+  for yank in [s:get_yankstack_head()] + s:yankstack_tail
     let i += 1
     echo s:format_yank(yank.text, i)
   endfor
