@@ -12,6 +12,7 @@
 let s:yankstack_tail = []
 let g:yankstack_size = 30
 let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'normal' }
+call yankstack#setup()
 
 function! s:yank_with_key(key)
   call s:yankstack_before_add()
@@ -122,7 +123,7 @@ function! s:format_yank(yank, i)
   return split(line, '\n')[0][: 80]
 endfunction
 
-function! s:define_yank_and_paste_mappings()
+function! s:define_mappings()
   let yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
   let paste_keys = ['p', 'P']
   for key in yank_keys
@@ -133,16 +134,14 @@ function! s:define_yank_and_paste_mappings()
     exec 'nnoremap <expr> <Plug>yankstack_' . key '<SID>paste_with_key("' . key . '", "normal")'
     exec 'xnoremap <expr> <Plug>yankstack_' . key '<SID>paste_with_key("' . key . '", "visual")'
   endfor
+
+  nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
+  nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>
+  inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1)<CR>
+  inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:<C-u>call <SID>substitute_paste(-v:count1)<CR>
+  inoremap <expr>   <Plug>yankstack_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'insert')
 endfunction
-
-call s:define_yank_and_paste_mappings()
-call yankstack#setup()
-
-nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
-nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>
-inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1)<CR>
-inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:<C-u>call <SID>substitute_paste(-v:count1)<CR>
-inoremap <expr>   <Plug>yankstack_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'insert')
+call s:define_mappings()
 
 if !exists('g:yankstack_map_keys') || g:yankstack_map_keys
   nmap [p    <Plug>yankstack_substitute_older_paste
