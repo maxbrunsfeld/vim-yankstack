@@ -136,7 +136,7 @@ function! s:define_yank_and_paste_mappings()
 endfunction
 
 call s:define_yank_and_paste_mappings()
-call yankstack#map_yank_and_paste_keys()
+call yankstack#setup()
 
 nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
 nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>

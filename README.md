@@ -19,11 +19,11 @@ Yankstack works by mapping the yank and paste keys to functions that do some boo
 calling through to the normal yank/paste keys. You may want to define your own mappings of the
 yank and paste keys. For example, I like to map the ```Y``` key to ```y$```, so that it behaves
 the same as ```D``` and ```C```. The yankstack mappings need to happen **before** you define any
-such mappings of your own. To achieve this, just call ```yankstack#define_yank_and_paste_mappings()```
+such mappings of your own. To achieve this, just call ```yankstack#setup()```
 in your vimrc, before defining your mappings:
 
 ```
-yankstack#define_yank_and_paste_mappings()
+yankstack#setup()
 nmap Y y$
 ```
 
