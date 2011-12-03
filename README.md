@@ -23,7 +23,7 @@ such mappings of your own. To achieve this, just call ```yankstack#setup()```
 in your vimrc, before defining your mappings:
 
 ```
-yankstack#setup()
+call yankstack#setup()
 nmap Y y$
 ```
 
