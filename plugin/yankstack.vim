@@ -4,8 +4,6 @@
 " Version:      1.0
 " Todo:
 "
-" - make :Yanks command display number of lines in yank
-"
 " - investigate whether an s: variable is the best way to
 "   scope the yankstack_tail
 "
@@ -95,14 +93,28 @@ function! s:show_yanks()
   let i = 0
   for yank in [s:get_yankstack_head()] + s:yankstack_tail
     let i += 1
-    echo s:format_yank(yank.text, i)
+    call s:show_yank(yank, i)
   endfor
 endfunction
 command! -nargs=0 Yanks call s:show_yanks()
 
-function! s:format_yank(yank, i)
-  let line = printf("%-4d %s", a:i, a:yank)
-  return split(line, '\n')[0][: 80]
+function! s:show_yank(yank, index)
+  let lines  = empty(a:yank.text) ? [' '] : split(a:yank.text, '\n')
+  let nlines = len(lines)
+  let line   = lines[0]
+  let line   = substitute(line, '\t', repeat(' ', &tabstop), 'g')
+  if len(line) > 80
+    let line = line[: 80] . '...'
+  endif
+
+  let index      = printf("%-4d", a:index)
+  let line       = printf("%-100s", line)
+  let line_count = printf("(%d %s)", nlines, nlines > 1 ? "lines" : "line")
+
+  echohl Directory | echo  index
+  echohl None      | echon line
+  echohl LineNr    | echon line_count
+  echohl None
 endfunction
 
 function! s:define_mappings()
