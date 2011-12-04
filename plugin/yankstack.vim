@@ -14,7 +14,7 @@
 
 let s:yankstack_tail = []
 let g:yankstack_size = 30
-let s:last_paste = { 'undo_number': -1, 'key': '', 'mode': 'normal' }
+let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'normal' }
 call yankstack#setup()
 
 function! s:yank_with_key(key)
@@ -27,12 +27,12 @@ function! s:paste_with_key(key, mode)
     call s:yankstack_before_add()
     call s:yankstack_rotate(1)
   endif
-  let s:last_paste = { 'undo_number': s:get_next_undo_number(), 'key': a:key, 'mode': a:mode }
+  let s:last_paste = { 'changedtick': b:changedtick+1, 'key': a:key, 'mode': a:mode }
   return a:key
 endfunction
 
 function! s:substitute_paste(offset)
-  if s:get_current_undo_number() != s:last_paste.undo_number
+  if b:changedtick != s:last_paste.changedtick
     echo 'Last change was not a paste'
     return
   endif
@@ -69,7 +69,7 @@ endfunction
 
 function! s:paste_from_yankstack()
   let [&autoindent, save_autoindent] = [0, &autoindent]
-  let s:last_paste.undo_number = s:get_next_undo_number()
+  let s:last_paste.changedtick = b:changedtick+1
   if s:last_paste.mode == 'insert'
     silent exec 'normal! a' . s:last_paste.key
   elseif s:last_paste.mode == 'visual'
@@ -88,27 +88,6 @@ endfunction
 
 function! s:set_yankstack_head(entry)
   call setreg('"', a:entry.text, a:entry.type)
-endfunction
-
-function! s:get_next_undo_number()
-  return undotree().seq_last + 1
-endfunction
-
-function! s:get_current_undo_number()
-  let entries = undotree().entries
-  if !empty(entries) && has_key(entries[-1], 'curhead')
-    return s:get_parent_undo_number()
-  else
-    return undotree().seq_cur
-  endif
-endfunction
-
-function! s:get_parent_undo_number()
-  let entry = undotree().entries[-1]
-  while has_key(entry, 'alt')
-    let entry = entry.alt[0]
-  endwhile
-  return entry.seq - 1
 endfunction
 
 function! s:show_yanks()
