@@ -99,21 +99,16 @@ endfunction
 command! -nargs=0 Yanks call s:show_yanks()
 
 function! s:show_yank(yank, index)
-  let lines  = empty(a:yank.text) ? [' '] : split(a:yank.text, '\n')
-  let nlines = len(lines)
-  let line   = lines[0]
-  let line   = substitute(line, '\t', repeat(' ', &tabstop), 'g')
-  if len(line) > 80
-    let line = line[: 80] . '...'
+  let index = printf("%-4d", a:index)
+  let lines = split(a:yank.text, '\n')
+  let line = empty(lines) ? '' : lines[0]
+  let line = substitute(line, '\t', repeat(' ', &tabstop), 'g')
+  if len(line) > 80 || len(lines) > 1
+    let line = line[: 80] . '…'
   endif
-
-  let index      = printf("%-4d", a:index)
-  let line       = printf("%-100s", line)
-  let line_count = printf("(%d %s)", nlines, nlines > 1 ? "lines" : "line")
 
   echohl Directory | echo  index
   echohl None      | echon line
-  echohl LineNr    | echon line_count
   echohl None
 endfunction
 
