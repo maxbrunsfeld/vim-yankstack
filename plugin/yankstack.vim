@@ -24,8 +24,11 @@ function! s:paste_with_key(key, mode)
   if a:mode == 'visual'
     call s:yankstack_before_add()
     call s:yankstack_rotate(1)
+    let tick = b:changedtick+2
+  else
+    let tick = b:changedtick+1
   endif
-  let s:last_paste = { 'changedtick': b:changedtick+1, 'key': a:key, 'mode': a:mode }
+  let s:last_paste = { 'changedtick': tick, 'key': a:key, 'mode': a:mode }
   return a:key
 endfunction
 
@@ -67,7 +70,6 @@ endfunction
 
 function! s:paste_from_yankstack()
   let [&autoindent, save_autoindent] = [0, &autoindent]
-  let s:last_paste.changedtick = b:changedtick+1
   if s:last_paste.mode == 'insert'
     silent exec 'normal! a' . s:last_paste.key
   elseif s:last_paste.mode == 'visual'
@@ -77,6 +79,7 @@ function! s:paste_from_yankstack()
   else
     silent exec 'normal!' s:last_paste.key
   endif
+  let s:last_paste.changedtick = b:changedtick
   let &autoindent = save_autoindent
 endfunction
 
