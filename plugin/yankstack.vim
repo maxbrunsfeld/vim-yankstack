@@ -95,8 +95,8 @@ function! s:show_yanks()
   echohl WarningMsg | echo "--- Yanks ---" | echohl None
   let i = 0
   for yank in [s:get_yankstack_head()] + s:yankstack_tail
-    let i += 1
     call s:show_yank(yank, i)
+    let i += 1
   endfor
 endfunction
 command! -nargs=0 Yanks call s:show_yanks()
