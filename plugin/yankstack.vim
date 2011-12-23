@@ -46,7 +46,7 @@ function! s:yankstack_before_add()
   let head = s:get_yankstack_head()
   if !empty(head.text) && (empty(s:yankstack_tail) || (head != s:yankstack_tail[0]))
     call insert(s:yankstack_tail, head)
-    let s:yankstack_tail = s:yankstack_tail[: g:yankstack_size]
+    let s:yankstack_tail = s:yankstack_tail[: g:yankstack_size-1]
   endif
 endfunction
 
