@@ -135,10 +135,7 @@ endfunction
 call s:define_mappings()
 
 if !exists('g:yankstack_map_keys') || g:yankstack_map_keys
-  nmap [p    <Plug>yankstack_substitute_older_paste
-  nmap ]p    <Plug>yankstack_substitute_newer_paste
-  imap <M-y> <Plug>yankstack_substitute_older_paste
-  imap <M-Y> <Plug>yankstack_substitute_newer_paste
-  imap <C-y> <Plug>yankstack_insert_mode_paste
+  nmap <M-p> <Plug>yankstack_substitute_older_paste
+  nmap <M-P> <Plug>yankstack_substitute_newer_paste
 endif
 
