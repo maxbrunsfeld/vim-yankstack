@@ -1,10 +1,11 @@
 yankstack.vim
 =============
 
-Yankstack.vim is a lightweight implementation of the Emacs 'kill ring' for Vim.
-It allows you to yank and delete things without worrying about losing the text
-that you yanked previously. It effectively turns your default register into a stack,
-and lets you cycle through the items in the stack after doing a paste.
+[Yankstack.vim](https://github.com/maxbrunsfeld/vim-yankstack) is a lightweight
+implementation of the Emacs 'kill ring' for Vim.  It allows you to yank and
+delete things without worrying about losing the text that you yanked
+previously. It effectively turns your default register into a stack, and lets
+you cycle through the items in the stack after doing a paste.
 
 This plugin is intended to be a simpler alternative to the
 [yankring](https://github.com/chrismetcalf/vim-yankring) plugin.
@@ -76,5 +77,9 @@ Also, if you want to load yankstack without the default key mappings, just
 ``` let g:yankstack_map_keys = 0 ```
 in your .vimrc file.
 
+## Contributing, Feedback ##
+
+I'd enjoy hearing anybody's feedback on yankstack, and welcome any contribution.
+Check it out on [github](https://github.com/maxbrunsfeld/vim-yankstack)!
 
 
