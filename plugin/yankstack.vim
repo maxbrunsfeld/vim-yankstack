@@ -23,7 +23,6 @@ endfunction
 function! s:paste_with_key(key, mode)
   if a:mode == 'visual'
     call s:yankstack_before_add()
-    call s:yankstack_rotate(1)
     let tick = b:changedtick+2
   else
     let tick = b:changedtick+1
