@@ -1,6 +1,6 @@
 GIT
   remote: git@github.com:maxbrunsfeld/vimbot.git
-  revision: eccc8c78cc68f1b2d70d17f8e6004230ec1bfee3
+  revision: 83bf87fcc3ad7ac72a31cc2baac69cca2f58f5ba
   specs:
     vimbot (0.0.1)
 

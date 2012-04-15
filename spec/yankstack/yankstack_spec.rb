@@ -34,25 +34,25 @@ describe "Yankstack" do
         yanks_output[3].should match /3\s+first line/
       end
 
-      describe "pasting a line" do
+      describe "pasting a line in normal mode" do
         before { vim.normal "p" }
 
         it "pastes the most recently yanked line" do
-          vim.current_line.should == "fourth line"
+          vim.line.should == "fourth line"
         end
 
-        describe "hitting the 'cycle pastes' key" do
+        describe "typing the 'cycle paste' key" do
           before { vim.normal "<M-p>" }
 
           it "replaces the pasted text with the previously yanked text" do
-            vim.current_line.should == "third line"
+            vim.line.should == "third line"
           end
 
           it "rotates the previously yanked text to the top of the yank stack" do
             yanks_output[0].should include 'third line'
             yanks_output[1].should include 'second line'
             yanks_output[2].should include 'first line'
-            yanks_output.last.should include 'fourth line'
+            yanks_output[-1].should include 'fourth line'
           end
         end
       end
@@ -60,7 +60,7 @@ describe "Yankstack" do
   end
 
   def yanks_output
-    lines = vim.exec("Yanks").split("\n")
+    lines = vim.command("Yanks").split("\n")
     lines[1..lines.length]
   end
 end
