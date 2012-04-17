@@ -8,13 +8,13 @@ describe "Yankstack" do
   after(:all)  { vim.stop }
   before { vim.clear_buffer }
 
-  describe "yanking a bunch of lines" do
+  shared_examples "yanking and pasting" do
     before do
       vim.insert "first line<CR>", "second line<CR>", "third line<CR>", "fourth line"
       vim.normal "gg", "yy", "jyy", "jyy", "jyy"
     end
 
-    it "pushes those lines to the :Yanks stack" do
+    it "pushes every yanked line to the :Yanks stack" do
       yanks_output[0].should match /0\s+fourth line/
       yanks_output[1].should match /1\s+third line/
       yanks_output[2].should match /2\s+second line/
@@ -82,6 +82,16 @@ describe "Yankstack" do
         before { vim.normal "<M-p>" }
       end
     end
+  end
+
+  describe "when the default register is configured normally" do
+    it_behaves_like "yanking and pasting"
+  end
+
+  describe "when clipboard=unnamed (the default register is the system clipboard)" do
+    before { vim.command "set clipboard=unnamed" }
+
+    it_behaves_like "yanking and pasting"
   end
 
   def yanks_output
