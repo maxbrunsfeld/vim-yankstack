@@ -83,19 +83,17 @@ function! s:paste_from_yankstack()
 endfunction
 
 function! s:get_yankstack_head()
-  if &clipboard == 'unnamed'
-    return { 'text': getreg('*'), 'type': getregtype('*') }
-  else
-    return { 'text': getreg('"'), 'type': getregtype('"') }
-  endif
+  let reg = s:default_register()
+  return { 'text': getreg(reg), 'type': getregtype(reg) }
 endfunction
 
 function! s:set_yankstack_head(entry)
-  if &clipboard == 'unnamed'
-    call setreg('*', a:entry.text, a:entry.type)
-  else
-    call setreg('"', a:entry.text, a:entry.type)
-  endif
+  let reg = s:default_register()
+  call setreg(reg, a:entry.text, a:entry.type)
+endfunction
+
+function! s:default_register()
+  return (&clipboard == 'unnamed') ? '*' : '"'
 endfunction
 
 function! s:show_yanks()
