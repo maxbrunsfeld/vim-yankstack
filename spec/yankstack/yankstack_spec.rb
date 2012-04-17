@@ -22,9 +22,7 @@ describe "Yankstack" do
 
     describe "yanking more lines" do
       before do
-        vim.normal "j", "yy"
-        vim.normal "j", "yy"
-        vim.normal "j", "yy"
+        vim.normal "jyy", "jyy", "jyy"
       end
 
       it "pushes those lines to the :Yanks stack" do
@@ -53,6 +51,20 @@ describe "Yankstack" do
             yanks_output[1].should include 'second line'
             yanks_output[2].should include 'first line'
             yanks_output[-1].should include 'fourth line'
+          end
+
+          it "rotates through the yanks when pressed multiple times" do
+            vim.normal "<M-p>"
+            vim.line.should == "second line"
+            vim.normal "<M-p>"
+            vim.line.should == "first line"
+
+            vim.normal "<M-P>"
+            vim.line.should == "second line"
+            vim.normal "<M-P>"
+            vim.line.should == "third line"
+            vim.normal "<M-P>"
+            vim.line.should == "fourth line"
           end
         end
       end
