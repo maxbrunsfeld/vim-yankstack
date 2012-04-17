@@ -68,6 +68,31 @@ describe "Yankstack" do
           end
         end
       end
+
+      describe "pasting a line in visual mode" do
+        before do
+          vim.normal "$"
+          vim.append "<CR>", "fifth line"
+          vim.normal "Vp"
+        end
+
+        it "overwrites the selection with the most recently yanked line" do
+          vim.line.should == "fourth line"
+        end
+
+        it "moves the previously yanked text to the top of the stack" do
+          yanks_output[0].should include "fourth line"
+          yanks_output[1].should include "third line"
+        end
+
+        it "moves the the overwritten text to the bottom of the stack" do
+          yanks_output[-1].should include "fifth line"
+        end
+
+        describe "typing the 'cycle paste' key" do
+          before { vim.normal "<M-p>" }
+        end
+      end
     end
   end
 
