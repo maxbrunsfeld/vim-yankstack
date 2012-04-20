@@ -4,9 +4,14 @@ describe "Yankstack" do
   let(:vim) { Vimbot::Driver.new }
   subject { vim }
 
-  before(:all) { vim.start }
-  after(:all)  { vim.stop }
-  before { vim.clear_buffer }
+  before(:all) do
+    vim.start
+    vim.set "nocompatible"
+    vim.set "runtimepath+=#{PLUGIN_ROOT}"
+    vim.runtime "plugin/yankstack.vim"
+  end
+  after(:all)   { vim.stop }
+  before(:each) { vim.clear_buffer }
 
   shared_examples "yanking and pasting" do
     before do
