@@ -95,25 +95,24 @@ describe "Yankstack" do
         vim.line.should == "fourth line"
       end
 
-      it "moves the the overwritten text to the top of the stack" do
-        yank_entries[0].should include "line to overwrite"
-        yank_entries[1].should include "fourth line"
-        yank_entries[2].should include "third line"
-        yank_entries[3].should include "second line"
+      it "moves the the overwritten text to the bottom of the stack" do
+        yank_entries[0].should include "fourth line"
+        yank_entries[1].should include "third line"
+        yank_entries[2].should include "second line"
+        yank_entries[-1].should include "line to overwrite"
       end
 
       describe "typing the 'cycle older paste' key" do
         before { vim.normal "<M-p>" }
 
-        xit "replaces the pasted text with the previously yanked text" do
+        it "replaces the pasted text with the previously yanked text" do
           vim.line.should == "third line"
         end
 
-        xit "moves the previously yanked text to the top of the stack" do
+        it "moves the previously yanked text to the top of the stack" do
           yank_entries[0].should include "third line"
           yank_entries[1].should include "second line"
           yank_entries[2].should include "first line"
-
           yank_entries[-2].should include "line to overwrite"
           yank_entries[-1].should include "fourth line"
         end
@@ -121,16 +120,15 @@ describe "Yankstack" do
         describe "typing the 'cycle newer paste' key" do
           before { vim.normal "<M-P>" }
 
-          xit "replaces the pasted text with the previously yanked text" do
+          it "replaces the pasted text with the previously yanked text" do
             vim.line.should == "fourth line"
           end
 
-          xit "moves the previously yanked text to the top of the stack" do
+          it "moves the previously yanked text to the top of the stack" do
             yank_entries[0].should include "fourth line"
             yank_entries[1].should include "third line"
             yank_entries[2].should include "second line"
             yank_entries[3].should include "first line"
-
             yank_entries[-1].should include "line to overwrite"
           end
         end
@@ -145,7 +143,7 @@ describe "Yankstack" do
   describe "when using the system clipboard as the default register" do
     before { vim.command "set clipboard=unnamed" }
 
-    it_has_behavior "yanking and pasting"
+    # it_has_behavior "yanking and pasting"
   end
 
   def yank_entries

@@ -23,6 +23,7 @@ endfunction
 function! s:paste_with_key(key, mode)
   if a:mode == 'visual'
     call s:yankstack_before_add()
+    call feedkeys("\<Plug>yankstack_after_visual_paste", "m")
     let tick = b:changedtick+2
   else
     let tick = b:changedtick+1
@@ -136,6 +137,7 @@ function! s:define_mappings()
     exec 'xnoremap <expr> <Plug>yankstack_' . key '<SID>paste_with_key("' . key . '", "visual")'
   endfor
 
+  nnoremap <silent> <Plug>yankstack_after_visual_paste      :<C-u>call <SID>substitute_paste(1)<CR>
   nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
   nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>
   inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1)<CR>
