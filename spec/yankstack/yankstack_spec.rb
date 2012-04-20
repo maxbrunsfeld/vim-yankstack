@@ -105,7 +105,7 @@ describe "Yankstack" do
       describe "typing the 'cycle older paste' key" do
         before { vim.normal "<M-p>" }
 
-        it "replaces the pasted text with the previously yanked text" do
+        xit "replaces the pasted text with the previously yanked text" do
           vim.line.should == "third line"
         end
 
