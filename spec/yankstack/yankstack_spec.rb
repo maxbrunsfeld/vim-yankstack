@@ -26,6 +26,27 @@ describe "Yankstack" do
       yank_entries[3].should match /3\s+first line/
     end
 
+    describe "yanking with different keys" do
+      before do
+        vim.normal "A", "<CR>", "line to delete", "<Esc>", "^"
+      end
+
+      KEYS_THAT_CHANGE_REGISTER = [
+        'cc', 'C',
+        'dd', 'D',
+        'x', 'X',
+        'Y',
+        'S'
+      ]
+
+      KEYS_THAT_CHANGE_REGISTER.each do |key|
+        it "pushes to the stack when deleting text with '#{key}'" do
+          vim.normal key
+          yank_entries[1].should match /1\s+fourth line/
+        end
+      end
+    end
+
     describe "pasting a line in normal mode" do
       before { vim.normal "p" }
 

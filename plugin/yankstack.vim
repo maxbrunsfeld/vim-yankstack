@@ -99,12 +99,16 @@ endfunction
 function! s:show_yanks()
   echohl WarningMsg | echo "--- Yanks ---" | echohl None
   let i = 0
-  for yank in [s:get_yankstack_head()] + s:yankstack_tail
+  for yank in g:yankstack()
     call s:show_yank(yank, i)
     let i += 1
   endfor
 endfunction
 command! -nargs=0 Yanks call s:show_yanks()
+
+function! g:yankstack()
+  return [s:get_yankstack_head()] + s:yankstack_tail
+endfunction
 
 function! s:show_yank(yank, index)
   let index = printf("%-4d", a:index)
@@ -121,7 +125,7 @@ function! s:show_yank(yank, index)
 endfunction
 
 function! s:define_mappings()
-  let yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P']
+  let yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P', 'S']
   let paste_keys = ['p', 'P']
   for key in yank_keys
     exec 'nnoremap <expr> <Plug>yankstack_' . key '<SID>yank_with_key("' . key . '")'
