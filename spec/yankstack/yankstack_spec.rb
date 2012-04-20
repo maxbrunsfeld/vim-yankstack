@@ -20,10 +20,10 @@ describe "Yankstack" do
     end
 
     it "pushes every yanked line to the :Yanks stack" do
-      yanks_output[0].should match /0\s+fourth line/
-      yanks_output[1].should match /1\s+third line/
-      yanks_output[2].should match /2\s+second line/
-      yanks_output[3].should match /3\s+first line/
+      yank_entries[0].should match /0\s+fourth line/
+      yank_entries[1].should match /1\s+third line/
+      yank_entries[2].should match /2\s+second line/
+      yank_entries[3].should match /3\s+first line/
     end
 
     describe "pasting a line in normal mode" do
@@ -41,10 +41,10 @@ describe "Yankstack" do
         end
 
         it "rotates the previously yanked text to the top of the yank stack" do
-          yanks_output[0].should include 'third line'
-          yanks_output[1].should include 'second line'
-          yanks_output[2].should include 'first line'
-          yanks_output[-1].should include 'fourth line'
+          yank_entries[0].should include 'third line'
+          yank_entries[1].should include 'second line'
+          yank_entries[2].should include 'first line'
+          yank_entries[-1].should include 'fourth line'
         end
 
         it "rotates through the yanks when pressed multiple times" do
@@ -70,17 +70,17 @@ describe "Yankstack" do
         vim.normal "Vp"
       end
 
-      xit "overwrites the selection with the most recently yanked line" do
+      it "overwrites the selection with the most recently yanked line" do
         vim.line.should == "fourth line"
       end
 
       xit "moves the previously yanked text to the top of the stack" do
-        yanks_output[0].should include "fourth line"
-        yanks_output[1].should include "third line"
+        yank_entries[0].should include "fourth line"
+        yank_entries[1].should include "third line"
       end
 
       xit "moves the the overwritten text to the bottom of the stack" do
-        yanks_output[-1].should include "fifth line"
+        yank_entries[-1].should include "fifth line"
       end
 
       describe "typing the 'cycle paste' key" do
@@ -89,20 +89,18 @@ describe "Yankstack" do
     end
   end
 
-  describe "when the default register is configured normally" do
+  describe "when using the normal default register" do
     it_behaves_like "yanking and pasting"
   end
 
-  describe "when clipboard=unnamed (the default register is the system clipboard)" do
+  describe "when using the system clipboard as the default register" do
     before { vim.command "set clipboard=unnamed" }
 
     it_behaves_like "yanking and pasting"
   end
 
-  def yanks_output
-    lines = vim.command("Yanks").split("\n")
-    lines[1..lines.length]
+  def yank_entries
+    @yank_entries ||= vim.command("Yanks").split("\n")[1..-1]
   end
 end
-
 
