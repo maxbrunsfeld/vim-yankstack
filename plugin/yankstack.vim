@@ -126,15 +126,15 @@ function! s:show_yank(yank, index)
 endfunction
 
 function! s:define_mappings()
-  let yank_keys  = ['x', 'y', 'd', 'c', 'X', 'Y', 'D', 'C', 'p', 'P', 'S']
+  let yank_keys  = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
   let paste_keys = ['p', 'P']
   for key in yank_keys
-    exec 'nnoremap <expr> <Plug>yankstack_' . key '<SID>yank_with_key("' . key . '")'
-    exec 'xnoremap <expr> <Plug>yankstack_' . key '<SID>yank_with_key("' . key . '")'
+    exec 'nnoremap <expr> <Plug>yankstack_key_' . key '<SID>yank_with_key("' . key . '")'
+    exec 'xnoremap <expr> <Plug>yankstack_key_' . key '<SID>yank_with_key("' . key . '")'
   endfor
   for key in paste_keys
-    exec 'nnoremap <expr> <Plug>yankstack_' . key '<SID>paste_with_key("' . key . '", "normal")'
-    exec 'xnoremap <expr> <Plug>yankstack_' . key '<SID>paste_with_key("' . key . '", "visual")'
+    exec 'nnoremap <expr> <Plug>yankstack_key_' . key '<SID>paste_with_key("' . key . '", "normal")'
+    exec 'xnoremap <expr> <Plug>yankstack_key_' . key '<SID>paste_with_key("' . key . '", "visual")'
   endfor
 
   nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>

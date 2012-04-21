@@ -2,7 +2,6 @@ require "spec_helper"
 
 describe "Yankstack" do
   let(:vim) { Vimbot::Driver.new }
-  subject { vim }
 
   before(:all) do
     vim.start
@@ -10,6 +9,7 @@ describe "Yankstack" do
     vim.set "runtimepath+=#{PLUGIN_ROOT}"
     vim.runtime "plugin/yankstack.vim"
   end
+
   after(:all)   { vim.stop }
   before(:each) { vim.clear_buffer }
 
@@ -31,15 +31,15 @@ describe "Yankstack" do
         vim.normal "A", "<CR>", "line to delete", "<Esc>", "^"
       end
 
-      KEYS_THAT_CHANGE_REGISTER = [
+      keys_that_change_register = [
         'cc', 'C',
         'dd', 'D',
+        's', 'S',
         'x', 'X',
-        'Y',
-        'S'
+        'yy', 'Y'
       ]
 
-      KEYS_THAT_CHANGE_REGISTER.each do |key|
+      keys_that_change_register.each do |key|
         it "pushes to the stack when deleting text with '#{key}'" do
           vim.normal key
           yank_entries[1].should match /1\s+fourth line/
