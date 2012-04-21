@@ -1,13 +1,14 @@
 " yankstack.vim - keep track of your history of yanked/killed text
 "
 " Maintainer:   Max Brunsfeld <https://github.com/maxbrunsfeld>
-" Version:      1.0
+" Version:      1.0.2
 " Todo:
 "
-" - investigate whether an s: variable is the best way to
-"   scope the yankstack_tail
-"
-" - support repeat.vim
+" - Make yankstack deal properly with 'select' mode. Currently,
+"   when text is overwritten in select mode, it is inserted to
+"   the default register. Yankstack needs to update the stack
+"   before this happens. This problem occurs when filling in
+"   placeholders using the `snipmate' plugin.
 "
 
 let s:yankstack_tail = []

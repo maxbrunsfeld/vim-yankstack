@@ -89,16 +89,21 @@ Check it out on [github](https://github.com/maxbrunsfeld/vim-yankstack)!
 
 ## Changelog ##
 
-1.0.1:
+### 1.0.2 (2012-4-20):
+  - Add test coverage using rspec and [vimbot](https://github.com/maxbrunsfeld/vimbot)!
+  - Perfect the behavior of the yankstack when pasting over text in visual
+    mode
+  - Fix bug where 's' and 'S' didn't push to the yankstack
+
+### 1.0.1 (2012-2-11):
   - Change default key bindings, update readme, add link to github page.
-    2012-02-11
 
-1.0.1:
-  - Fix bug when displaying empty yanks. 2011-12-08
+### 1.0.1 (2011-12-08):
+  - Fix bug when displaying empty yanks.
 
-1.0:
+### 1.0.0 (2011-12-04):
   - Remove unnecessary dependency on the undotree() function. Plugin should
-    now work on any recent version of vim.  2011-12-04
+    now work on any recent version of vim.
 
 ## License ##
 Copyright (c) Max Brunsfeld.  Distributed under the same terms as Vim itself.
