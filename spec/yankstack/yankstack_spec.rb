@@ -143,7 +143,7 @@ describe "Yankstack" do
   describe "when using the system clipboard as the default register" do
     before { vim.command "set clipboard=unnamed" }
 
-    # it_has_behavior "yanking and pasting"
+    it_has_behavior "yanking and pasting"
   end
 
   def yank_entries
