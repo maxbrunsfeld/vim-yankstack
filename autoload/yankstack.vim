@@ -9,5 +9,10 @@ function! yankstack#setup()
     exec 'nmap' key '<Plug>yankstack_key_' . key
     exec 'xmap' key '<Plug>yankstack_key_' . key
   endfor
+
+  let characters = split("qwertyuiopasdfghjklzxcvbnm1234567890_", '\zs')
+  for key in characters
+    exec 'smap' key '<Plug>yankstack_key_' . key
+  endfor
 endfunction
 

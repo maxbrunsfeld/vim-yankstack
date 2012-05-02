@@ -138,6 +138,11 @@ function! s:define_mappings()
     exec 'xnoremap <expr> <Plug>yankstack_key_' . key '<SID>paste_with_key("' . key . '", "visual")'
   endfor
 
+  let characters = split("qwertyuiopasdfghjklzxcvbnm1234567890_", '\zs')
+  for key in characters
+    exec 'snoremap <expr> <Plug>yankstack_key_' . key '<SID>yank_with_key("' . key . '")'
+  endfor
+
   nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
   nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>
   inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1)<CR>

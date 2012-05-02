@@ -44,6 +44,13 @@ describe "Yankstack" do
           yank_entries[1].should match /1\s+fourth line/
         end
       end
+
+      it "pushes to the stack when overwriting text in select mode" do
+        vim.type "V"
+        vim.type "<c-g>", "this overwrites the last line"
+        yank_entries[0].should include "line to delete"
+        yank_entries[1].should include "fourth line"
+      end
     end
 
     describe "pasting a line in normal mode" do
