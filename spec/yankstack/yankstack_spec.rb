@@ -5,7 +5,6 @@ describe "Yankstack" do
 
   before(:all) do
     vim.start
-    vim.set "nocompatible"
     vim.set "runtimepath+=#{PLUGIN_ROOT}"
     vim.runtime "plugin/yankstack.vim"
   end
@@ -141,7 +140,7 @@ describe "Yankstack" do
   end
 
   describe "when using the system clipboard as the default register" do
-    before { vim.command "set clipboard=unnamed" }
+    before { vim.set "clipboard" "unnamed" }
 
     it_has_behavior "yanking and pasting"
   end
