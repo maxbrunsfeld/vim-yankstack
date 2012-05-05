@@ -1,14 +1,8 @@
 " yankstack.vim - keep track of your history of yanked/killed text
 "
 " Maintainer:   Max Brunsfeld <https://github.com/maxbrunsfeld>
-" Version:      1.0.2
+" Version:      1.0.3
 " Todo:
-"
-" - Make yankstack deal properly with 'select' mode. Currently,
-"   when text is overwritten in select mode, it is inserted to
-"   the default register. Yankstack needs to update the stack
-"   before this happens. This problem occurs when filling in
-"   placeholders using the `snipmate' plugin.
 "
 
 let s:yankstack_tail = []

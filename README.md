@@ -89,6 +89,11 @@ Check it out on [github](https://github.com/maxbrunsfeld/vim-yankstack)!
 
 ## Changelog ##
 
+
+### 1.0.3 (2012-05-04):
+  - Fix bug when overwriting text in select mode. This was causing
+    problems for snipMate users.
+
 ### 1.0.2 (2012-4-20):
   - Add test coverage using rspec and [vimbot](https://github.com/maxbrunsfeld/vimbot)!
   - Perfect the behavior of the yankstack when pasting over text in visual
