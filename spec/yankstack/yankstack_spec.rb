@@ -58,6 +58,7 @@ describe "Yankstack" do
         before { vim.normal "p" }
 
         it "pastes the most recently yanked line" do
+          vim.line_number.should == 5
           vim.line.should == "fourth line"
         end
 
@@ -91,7 +92,39 @@ describe "Yankstack" do
         end
       end
 
+      describe "typing the `substitute_older_paste` key without pasting first" do
+        before { vim.type "<M-p>" }
 
+        it "pastes the most recently yanked line" do
+          vim.line_number.should == 5
+          vim.line.should == "fourth line"
+        end
+
+        describe "typing the 'cycle paste' key" do
+          before { vim.normal "<M-p>" }
+
+          it "replaces the pasted text with the previously yanked text" do
+            vim.line.should == "third line"
+          end
+        end
+      end
+
+      describe "typing the `substitute_newer_paste` key without pasting first" do
+        before { vim.type "<M-P>" }
+
+        it "pastes the most recently yanked line" do
+          vim.line_number.should == 5
+          vim.line.should == "fourth line"
+        end
+
+        describe "typing the 'cycle paste' key" do
+          before { vim.normal "<M-p>" }
+
+          it "replaces the pasted text with the previously yanked text" do
+            vim.line.should == "third line"
+          end
+        end
+      end
     end
 
     context "in visual mode, with text highlighted" do
@@ -146,6 +179,24 @@ describe "Yankstack" do
               yank_entries[-1].should include "line to overwrite"
             end
           end
+        end
+      end
+
+      describe "typing the `substitute_older_paste` key without pasting first" do
+        before { vim.type "<M-p>" }
+
+        it "overwrites the selection with the most recently yanked line" do
+          vim.line_number.should == 5
+          vim.line.should == "fourth line"
+        end
+      end
+
+      describe "typing the `substitute_newer_paste` key without pasting first" do
+        before { vim.type "<M-P>" }
+
+        it "overwrites the selection with the most recently yanked line" do
+          vim.line_number.should == 5
+          vim.line.should == "fourth line"
         end
       end
     end

@@ -26,14 +26,14 @@ function! s:paste_with_key(key, mode)
   return a:key
 endfunction
 
-function! s:substitute_paste(offset)
-  if b:changedtick != s:last_paste.changedtick
-    echo 'Last change was not a paste'
-    return
+function! s:substitute_paste(offset, mode)
+  if s:last_change_was_paste()
+    silent undo
+    call s:yankstack_rotate(a:offset)
+    call s:paste_from_yankstack()
+  else
+    call s:paste_in_mode(a:mode)
   endif
-  silent undo
-  call s:yankstack_rotate(a:offset)
-  call s:paste_from_yankstack()
 endfunction
 
 function! s:yankstack_before_add()
@@ -87,8 +87,22 @@ function! s:set_yankstack_head(entry)
   call setreg(reg, a:entry.text, a:entry.type)
 endfunction
 
+function! s:last_change_was_paste()
+  return b:changedtick == s:last_paste.changedtick
+endfunction
+
 function! s:default_register()
   return (&clipboard == 'unnamed') ? '*' : '"'
+endfunction
+
+function! s:paste_in_mode(mode)
+  if a:mode == 'i'
+    echom "Last change was not a paste."
+  elseif a:mode == 'v'
+    normal gvp
+  else
+    normal p
+  endif
 endfunction
 
 function! g:yankstack()
@@ -142,15 +156,19 @@ function! yankstack#setup()
   endfor
 endfunction
 
-nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1)<CR>
-nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1)<CR>
-inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1)<CR>
-inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:<C-u>call <SID>substitute_paste(-v:count1)<CR>
-inoremap <expr>   <Plug>yankstack_insert_mode_paste       <SID>paste_with_key('<C-g>u<C-r>"', 'insert')
+nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1, 'n')<CR>
+xnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1, 'v')<CR>
+inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1, 'i')<CR>
+nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1, 'n')<CR>
+xnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1, 'v')<CR>
+inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:<C-u>call <SID>substitute_paste(-v:count1, 'i')<CR>
 
 if !exists('g:yankstack_map_keys') || g:yankstack_map_keys
   nmap <M-p> <Plug>yankstack_substitute_older_paste
-  nmap <M-P> <Plug>yankstack_substitute_newer_paste
+  xmap <M-p> <Plug>yankstack_substitute_older_paste
   imap <M-p> <Plug>yankstack_substitute_older_paste
+  nmap <M-P> <Plug>yankstack_substitute_newer_paste
+  xmap <M-P> <Plug>yankstack_substitute_newer_paste
+  imap <M-P> <Plug>yankstack_substitute_newer_paste
 endif
 
