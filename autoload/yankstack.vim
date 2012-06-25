@@ -7,7 +7,7 @@
 
 let s:yankstack_tail = []
 let g:yankstack_size = 30
-let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'normal' }
+let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'n' }
 
 function! s:yank_with_key(key)
   call s:yankstack_before_add()
@@ -15,7 +15,7 @@ function! s:yank_with_key(key)
 endfunction
 
 function! s:paste_with_key(key, mode)
-  if a:mode == 'visual'
+  if a:mode == 'v'
     call s:yankstack_before_add()
     call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
     let tick = b:changedtick+2
@@ -64,9 +64,9 @@ endfunction
 
 function! s:paste_from_yankstack()
   let [&autoindent, save_autoindent] = [0, &autoindent]
-  if s:last_paste.mode == 'insert'
+  if s:last_paste.mode == 'i'
     silent exec 'normal! a' . s:last_paste.key
-  elseif s:last_paste.mode == 'visual'
+  elseif s:last_paste.mode == 'v'
     let head = s:get_yankstack_head()
     silent exec 'normal! gv' . s:last_paste.key
     call s:set_yankstack_head(head)
@@ -133,8 +133,8 @@ function! yankstack#setup()
   endfor
 
   for key in paste_keys
-    exec 'nnoremap <expr>' key '<SID>paste_with_key("' . key . '", "normal")'
-    exec 'xnoremap <expr>' key '<SID>paste_with_key("' . key . '", "visual")'
+    exec 'nnoremap <expr>' key '<SID>paste_with_key("' . key . '", "n")'
+    exec 'xnoremap <expr>' key '<SID>paste_with_key("' . key . '", "v")'
   endfor
 
   for key in word_characters
