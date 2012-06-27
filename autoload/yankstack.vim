@@ -10,19 +10,12 @@ let g:yankstack_size = 30
 let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'n' }
 
 function! s:yank_with_key(key)
-  call s:yankstack_before_add()
+  call s:before_add()
   return a:key
 endfunction
 
 function! s:paste_with_key(key, mode)
-  if a:mode == 'v'
-    call s:yankstack_before_add()
-    call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
-    let tick = b:changedtick+2
-  else
-    let tick = b:changedtick+1
-  endif
-  let s:last_paste = { 'changedtick': tick, 'key': a:key, 'mode': a:mode }
+  call s:before_paste(a:key, a:mode)
   return a:key
 endfunction
 
@@ -36,12 +29,23 @@ function! s:substitute_paste(offset, mode)
   endif
 endfunction
 
-function! s:yankstack_before_add()
+function! s:before_add()
   let head = s:get_yankstack_head()
   if !empty(head.text) && (empty(s:yankstack_tail) || (head != s:yankstack_tail[0]))
     call insert(s:yankstack_tail, head)
     let s:yankstack_tail = s:yankstack_tail[: g:yankstack_size-1]
   endif
+endfunction
+
+function! s:before_paste(key, mode)
+  if a:mode == 'v'
+    call s:before_add()
+    call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
+    let tick = b:changedtick+2
+  else
+    let tick = b:changedtick+1
+  endif
+  let s:last_paste = { 'changedtick': tick, 'key': a:key, 'mode': a:mode }
 endfunction
 
 function! s:yankstack_rotate(offset)
@@ -97,7 +101,7 @@ endfunction
 
 function! s:paste_in_mode(mode)
   if a:mode == 'i'
-    echom "Last change was not a paste."
+    normal p
   elseif a:mode == 'v'
     normal gvp
   else
