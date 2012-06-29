@@ -14,15 +14,15 @@ describe "Yankstack" do
 
   shared_examples "yanking and pasting" do
     before do
-      vim.insert "first line<CR>", "second line<CR>", "third line<CR>", "fourth line"
-      vim.normal "gg", "yy", "jyy", "jyy", "jyy"
+      vim.insert "first_line<CR>", "second_line<CR>", "third_line<CR>", "fourth_line"
+      vim.normal "gg", "yw", "jyw", "jyw", "jyw"
     end
 
-    it "pushes every yanked line to the :Yanks stack" do
-      yank_entries[0].should match /0\s+fourth line/
-      yank_entries[1].should match /1\s+third line/
-      yank_entries[2].should match /2\s+second line/
-      yank_entries[3].should match /3\s+first line/
+    it "pushes every yanked string to the :Yanks stack" do
+      yank_entries[0].should match /0\s+fourth_line/
+      yank_entries[1].should match /1\s+third_line/
+      yank_entries[2].should match /2\s+second_line/
+      yank_entries[3].should match /3\s+first_line/
     end
 
     describe "yanking with different keys" do
@@ -41,7 +41,7 @@ describe "Yankstack" do
       keys_that_change_register.each do |key|
         it "pushes to the stack when deleting text with '#{key}'" do
           vim.normal key
-          yank_entries[1].should match /1\s+fourth line/
+          yank_entries[1].should match /1\s+fourth_line/
         end
       end
 
@@ -49,45 +49,47 @@ describe "Yankstack" do
         vim.type "V"
         vim.type "<c-g>", "this overwrites the last line"
         yank_entries[0].should include "line to delete"
-        yank_entries[1].should include "fourth line"
+        yank_entries[1].should include "fourth_line"
       end
     end
 
     context "in normal mode" do
-      describe "pasting a line with 'p'" do
+      before { vim.normal "o", "<Esc>" }
+
+      describe "pasting a string with 'p'" do
         before { vim.normal "p" }
 
-        it "pastes the most recently yanked line" do
+        it "pastes the most recently yanked string" do
           vim.line_number.should == 5
-          vim.line.should == "fourth line"
+          vim.line.should == "fourth_line"
         end
 
         describe "typing the 'cycle paste' key" do
           before { vim.normal "<M-p>" }
 
-          it "replaces the pasted text with the previously yanked text" do
-            vim.line.should == "third line"
+          it "replaces the pasted string with the previously yanked text" do
+            vim.line.should == "third_line"
           end
 
           it "rotates the previously yanked text to the top of the yank stack" do
-            yank_entries[0].should include 'third line'
-            yank_entries[1].should include 'second line'
-            yank_entries[2].should include 'first line'
-            yank_entries[-1].should include 'fourth line'
+            yank_entries[0].should include 'third_line'
+            yank_entries[1].should include 'second_line'
+            yank_entries[2].should include 'first_line'
+            yank_entries[-1].should include 'fourth_line'
           end
 
           it "rotates through the yanks when pressed multiple times" do
             vim.normal "<M-p>"
-            vim.line.should == "second line"
+            vim.line.should == "second_line"
             vim.normal "<M-p>"
-            vim.line.should == "first line"
+            vim.line.should == "first_line"
 
             vim.normal "<M-P>"
-            vim.line.should == "second line"
+            vim.line.should == "second_line"
             vim.normal "<M-P>"
-            vim.line.should == "third line"
+            vim.line.should == "third_line"
             vim.normal "<M-P>"
-            vim.line.should == "fourth line"
+            vim.line.should == "fourth_line"
           end
         end
       end
@@ -95,16 +97,16 @@ describe "Yankstack" do
       describe "typing the `substitute_older_paste` key without pasting first" do
         before { vim.type "<M-p>" }
 
-        it "pastes the most recently yanked line" do
+        it "pastes the most recently yanked string" do
           vim.line_number.should == 5
-          vim.line.should == "fourth line"
+          vim.line.should == "fourth_line"
         end
 
         describe "typing the 'cycle paste' key" do
           before { vim.normal "<M-p>" }
 
           it "replaces the pasted text with the previously yanked text" do
-            vim.line.should == "third line"
+            vim.line.should == "third_line"
           end
         end
       end
@@ -112,16 +114,16 @@ describe "Yankstack" do
       describe "typing the `substitute_newer_paste` key without pasting first" do
         before { vim.type "<M-P>" }
 
-        it "pastes the most recently yanked line" do
+        it "pastes the most recently yanked string" do
           vim.line_number.should == 5
-          vim.line.should == "fourth line"
+          vim.line.should == "fourth_line"
         end
 
         describe "typing the 'cycle paste' key" do
           before { vim.normal "<M-p>" }
 
           it "replaces the pasted text with the previously yanked text" do
-            vim.line.should == "third line"
+            vim.line.should == "third_line"
           end
         end
       end
@@ -133,19 +135,19 @@ describe "Yankstack" do
         vim.normal "V"
       end
 
-      describe "pasting a line with 'p'" do
+      describe "pasting a string with 'p'" do
         before do
           vim.type "p"
         end
 
-        it "overwrites the selection with the most recently yanked line" do
-          vim.line.should == "fourth line"
+        it "overwrites the selection with the most recently yanked string" do
+          vim.line.should == "fourth_line"
         end
 
         it "moves the the overwritten text to the bottom of the stack" do
-          yank_entries[0].should include "fourth line"
-          yank_entries[1].should include "third line"
-          yank_entries[2].should include "second line"
+          yank_entries[0].should include "fourth_line"
+          yank_entries[1].should include "third_line"
+          yank_entries[2].should include "second_line"
           yank_entries[-1].should include "line to overwrite"
         end
 
@@ -153,29 +155,29 @@ describe "Yankstack" do
           before { vim.normal "<M-p>" }
 
           it "replaces the pasted text with the previously yanked text" do
-            vim.line.should == "third line"
+            vim.line.should == "third_line"
           end
 
           it "moves the previously yanked text to the top of the stack" do
-            yank_entries[0].should include "third line"
-            yank_entries[1].should include "second line"
-            yank_entries[2].should include "first line"
+            yank_entries[0].should include "third_line"
+            yank_entries[1].should include "second_line"
+            yank_entries[2].should include "first_line"
             yank_entries[-2].should include "line to overwrite"
-            yank_entries[-1].should include "fourth line"
+            yank_entries[-1].should include "fourth_line"
           end
 
           describe "typing the 'cycle newer paste' key" do
             before { vim.normal "<M-P>" }
 
             it "replaces the pasted text with the previously yanked text" do
-              vim.line.should == "fourth line"
+              vim.line.should == "fourth_line"
             end
 
             it "moves the previously yanked text to the top of the stack" do
-              yank_entries[0].should include "fourth line"
-              yank_entries[1].should include "third line"
-              yank_entries[2].should include "second line"
-              yank_entries[3].should include "first line"
+              yank_entries[0].should include "fourth_line"
+              yank_entries[1].should include "third_line"
+              yank_entries[2].should include "second_line"
+              yank_entries[3].should include "first_line"
               yank_entries[-1].should include "line to overwrite"
             end
           end
@@ -185,28 +187,31 @@ describe "Yankstack" do
       describe "typing the `substitute_older_paste` key without pasting first" do
         before { vim.type "<M-p>" }
 
-        it "overwrites the selection with the most recently yanked line" do
+        it "overwrites the selection with the most recently yanked string" do
           vim.line_number.should == 5
-          vim.line.should == "fourth line"
+          vim.line.should == "fourth_line"
         end
       end
 
       describe "typing the `substitute_newer_paste` key without pasting first" do
         before { vim.type "<M-P>" }
 
-        it "overwrites the selection with the most recently yanked line" do
+        it "overwrites the selection with the most recently yanked string" do
           vim.line_number.should == 5
-          vim.line.should == "fourth line"
+          vim.line.should == "fourth_line"
         end
       end
     end
 
-    describe "pasting a line in insert mode using `substitute_older_paste`" do
-      before { vim.normal "A", "<M-p>" }
+    describe "pasting a string in insert mode using `substitute_older_paste`" do
+      before do
+        vim.normal "A<Cr>", "hello "
+        vim.type "<M-p>"
+      end
 
       it "pastes the most recently yanked text" do
         vim.line_number.should == 5
-        vim.line.should == "fourth line"
+        vim.line.should == "hello fourth_line"
       end
 
       describe "typing the 'cycle paste' key" do
@@ -214,7 +219,7 @@ describe "Yankstack" do
 
         it "replaces the pasted text with the previously yanked text" do
           vim.line_number.should == 5
-          vim.line.should == "third line"
+          vim.line.should == "hello third_line"
         end
 
         it "stays in insert mode" do
@@ -222,32 +227,32 @@ describe "Yankstack" do
         end
 
         it "rotates the previously yanked text to the top of the yank stack" do
-          yank_entries[0].should include 'third line'
-          yank_entries[1].should include 'second line'
-          yank_entries[2].should include 'first line'
-          yank_entries[-1].should include 'fourth line'
+          yank_entries[0].should include 'third_line'
+          yank_entries[1].should include 'second_line'
+          yank_entries[2].should include 'first_line'
+          yank_entries[-1].should include 'fourth_line'
         end
 
         it "rotates through the yanks when pressed multiple times" do
           vim.type "<M-p>"
           vim.line_number.should == 5
-          vim.line.should == "second line"
+          vim.line.should == "hello second_line"
 
           vim.type "<M-p>"
           vim.line_number.should == 5
-          vim.line.should == "first line"
+          vim.line.should == "hello first_line"
 
           vim.type "<M-P>"
           vim.line_number.should == 5
-          vim.line.should == "second line"
+          vim.line.should == "hello second_line"
 
           vim.type "<M-P>"
           vim.line_number.should == 5
-          vim.line.should == "third line"
+          vim.line.should == "hello third_line"
 
           vim.type "<M-P>"
           vim.line_number.should == 5
-          vim.line.should == "fourth line"
+          vim.line.should == "hello fourth_line"
         end
       end
     end
