@@ -103,7 +103,7 @@ endfunction
 
 function! s:paste_in_mode(mode)
   if a:mode == 'i'
-    " exec "set undolevels=" . &undolevels
+    exec "set undolevels=" . &undolevels
     call s:before_paste("\<C-r>\"", 'i')
     normal gp
   elseif a:mode == 'v'
