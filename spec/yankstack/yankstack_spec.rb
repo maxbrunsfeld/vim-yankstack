@@ -203,60 +203,80 @@ describe "Yankstack" do
       end
     end
 
-    describe "pasting a string in insert mode using `substitute_older_paste`" do
-      before do
-        vim.normal "A<Cr>", "hello "
-        vim.type "<M-p>"
-      end
-
-      it "pastes the most recently yanked text" do
-        vim.line_number.should == 5
-        vim.line.should == "hello fourth_line"
-      end
-
-      describe "typing the 'cycle paste' key" do
-        before { vim.type "<M-p>" }
-
-        it "replaces the pasted text with the previously yanked text" do
-          vim.line_number.should == 5
-          vim.line.should == "hello third_line"
-        end
-
-        it "stays in insert mode" do
-          vim.should be_in_insert_mode
-        end
-
-        it "rotates the previously yanked text to the top of the yank stack" do
-          yank_entries[0].should include 'third_line'
-          yank_entries[1].should include 'second_line'
-          yank_entries[2].should include 'first_line'
-          yank_entries[-1].should include 'fourth_line'
-        end
-
-        it "rotates through the yanks when pressed multiple times" do
+    context "in insert mode" do
+      describe "typing the `substitute_older_paste` key without pasting first" do
+        before do
+          vim.normal "A<Cr>", "hello "
           vim.type "<M-p>"
-          vim.line_number.should == 5
-          vim.line.should == "hello second_line"
+        end
 
-          vim.type "<M-p>"
-          vim.line_number.should == 5
-          vim.line.should == "hello first_line"
-
-          vim.type "<M-P>"
-          vim.line_number.should == 5
-          vim.line.should == "hello second_line"
-
-          vim.type "<M-P>"
-          vim.line_number.should == 5
-          vim.line.should == "hello third_line"
-
-          vim.type "<M-P>"
+        it "pastes the most recently yanked text" do
           vim.line_number.should == 5
           vim.line.should == "hello fourth_line"
         end
+
+        it "stays in insert mode, with the cursor at the end of the pasted text" do
+          vim.should be_in_insert_mode
+          vim.column_number.should == "hello fourth_line".length + 1
+        end
+
+        describe "typing the `substitute_older_paste` key again" do
+          before { vim.type "<M-p>" }
+
+          it "replaces the pasted text with the previously yanked text" do
+            vim.line_number.should == 5
+            vim.line.should == "hello third_line"
+          end
+
+          it "stays in insert mode, with the cursor at the end of the pasted text" do
+            vim.should be_in_insert_mode
+            vim.column_number.should == "hello third_line".length + 1
+          end
+
+          it "rotates the previously yanked text to the top of the yank stack" do
+            yank_entries[0].should include 'third_line'
+            yank_entries[1].should include 'second_line'
+            yank_entries[2].should include 'first_line'
+            yank_entries[-1].should include 'fourth_line'
+          end
+
+          it "rotates through the yanks when pressed multiple times" do
+            vim.type "<M-p>"
+            vim.line_number.should == 5
+            vim.line.should == "hello second_line"
+
+            vim.type "<M-p>"
+            vim.line_number.should == 5
+            vim.line.should == "hello first_line"
+
+            vim.type "<M-P>"
+            vim.line_number.should == 5
+            vim.line.should == "hello second_line"
+
+            vim.type "<M-P>"
+            vim.line_number.should == 5
+            vim.line.should == "hello third_line"
+
+            vim.type "<M-P>"
+            vim.line_number.should == 5
+            vim.line.should == "hello fourth_line"
+          end
+        end
+      end
+
+      describe "typing `substitute_older_paste` after a linewise yank" do
+        before do
+          vim.normal "yy", "A"
+          vim.type "<M-p>"
+        end
+
+        xit "pastes and puts the cursor after the pasted text" do
+          vim.line_number.should == 5
+          vim.line.should == "fourth_line"
+          vim.column_number.should == "fourth_line".length
+        end
       end
     end
-
   end
 
   describe "when using the normal default register" do

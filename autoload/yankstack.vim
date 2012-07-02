@@ -42,6 +42,8 @@ function! s:before_paste(key, mode)
     call s:before_add()
     call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
     let tick = b:changedtick+2
+  elseif a:mode == 'i'
+    let tick = b:changedtick+2
   else
     let tick = b:changedtick+1
   endif
@@ -101,7 +103,9 @@ endfunction
 
 function! s:paste_in_mode(mode)
   if a:mode == 'i'
-    normal p
+    " exec "set undolevels=" . &undolevels
+    call s:before_paste("\<C-r>\"", 'i')
+    normal gp
   elseif a:mode == 'v'
     normal gvp
   else
@@ -142,7 +146,7 @@ function! yankstack#setup()
   let g:yankstack_did_setup = 1
 
   let yank_keys  = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
-  let paste_keys = ['p', 'P']
+  let paste_keys = ['p', 'P', 'gp', 'gP']
   let word_characters = split("qwertyuiopasdfghjklzxcvbnm1234567890_", '\zs')
 
   for key in yank_keys
