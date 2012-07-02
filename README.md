@@ -28,6 +28,9 @@ By default, yankstack adds only 2 key bindings, in normal and visual modes:
 After pasting some text using ```p``` or ```P```, you can cycle through your
 yank history using these commands.
 
+Typing either of these keys *without* pasting first will do a normal paste
+(the same as typing `p`). This also works in insert mode.
+
 A note about the meta key - if you're using MacVim, and you want to use
 this plugin's default key bindings (or any bindings involving the `option`
 key), you must ```:set macmeta```
@@ -39,12 +42,11 @@ Its output is similar to the ```:registers``` command.
 
 ## Configuration ##
 
-Yankstack defines three plugin mappings that you can map to keys of your choosing.
+Yankstack defines two plugin mappings that you can map to keys of your choosing.
 The same mappings work in normal and insert modes.
 
 - ```<Plug>yankstack_substitute_older_paste``` - cycle backwards through your history of yanks
 - ```<Plug>yankstack_substitute_newer_paste``` - cycle forwards through your history of yanks
-- ```<Plug>yankstack_insert_mode_paste``` - paste in insert mode such that yankstack will register the paste
 
 For example, if you wanted to define some mappings based on your 'leader' key,
 you could do this:
@@ -52,14 +54,6 @@ you could do this:
 ```
 nmap <leader>p <Plug>yankstack_substitute_older_paste
 nmap <leader>P <Plug>yankstack_substitute_older_paste
-```
-
-Or, if you wanted to define emacs style bindings in insert mode, you could do this:
-
-```
-imap <C-y> <Plug>yankstack_insert_mode_paste
-imap <M-y> <Plug>yankstack_substitute_older_paste
-imap <M-Y> <Plug>yankstack_substitute_older_paste
 ```
 
 Also, if you want to load yankstack without the default key mappings, just
@@ -89,6 +83,10 @@ Check it out on [github](https://github.com/maxbrunsfeld/vim-yankstack)!
 
 ## Changelog ##
 
+
+### 1.0.4 (2012-07-01)
+  - Make it so that yankstack-cycling keys cause a normal paste if they are
+    used without pasting first. Fix stack-cycling in insert-mode.
 
 ### 1.0.3 (2012-05-04):
   - Fix bug when overwriting text in select mode. This was causing

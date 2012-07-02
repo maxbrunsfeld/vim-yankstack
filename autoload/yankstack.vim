@@ -1,8 +1,11 @@
 " yankstack.vim - keep track of your history of yanked/killed text
 "
 " Maintainer:   Max Brunsfeld <https://github.com/maxbrunsfeld>
-" Version:      1.0.3
+" Version:      1.0.4
 " Todo:
+"
+"   - fix cursor placement after multiline pastes with `meta-p`
+"     in insert mode
 "
 
 let s:yankstack_tail = []
