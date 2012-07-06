@@ -18,7 +18,7 @@ function! s:yank_with_key(key)
 endfunction
 
 function! s:paste_with_key(key, mode)
-  call s:before_paste(a:key, a:mode)
+  call s:before_new_paste(a:key, a:mode)
   return a:key
 endfunction
 
@@ -28,11 +28,12 @@ function! s:substitute_paste(offset, current_mode)
     call s:yankstack_rotate(a:offset)
     let mode = s:last_paste.mode
     let key = s:last_paste.key
+    call s:before_paste(key, mode)
   else
     let mode = a:current_mode
     let key = s:default_paste_key(a:current_mode)
+    call s:before_new_paste(key, mode)
   endif
-  call s:before_paste(key, mode)
   return s:paste_from_yankstack(key, mode)
 endfunction
 
@@ -44,18 +45,20 @@ function! s:before_yank()
   endif
 endfunction
 
-function! s:before_paste(key, mode)
+function! s:before_new_paste(key, mode)
+  call s:before_paste(a:key, a:mode)
   if a:mode == 'v'
     call s:before_yank()
+    call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
   endif
+endfunction
+
+function! s:before_paste(key, mode)
   call feedkeys("\<Plug>yankstack_after_paste_" . a:mode, "m")
   let s:last_paste = { 'changedtick': -1, 'key': a:key, 'mode': a:mode }
 endfunction
 
 function! s:after_paste(mode)
-  if a:mode == 'v'
-    " call s:substitute_paste(1, a:mode)
-  endif
   let s:last_paste.changedtick = b:changedtick
 endfunction
 

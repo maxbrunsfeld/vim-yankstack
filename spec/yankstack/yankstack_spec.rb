@@ -13,7 +13,7 @@ describe "Yankstack" do
     vim.runtime "plugin/yankstack.vim"
   end
 
-  # after(:all)   { vim.stop }
+  after(:all)   { vim.stop }
   before(:each) { vim.clear_buffer }
 
   shared_examples "yanking and pasting" do
