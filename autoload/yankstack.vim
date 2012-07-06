@@ -4,9 +4,6 @@
 " Version:      1.0.4
 " Todo:
 "
-"   - fix cursor placement after multiline pastes with `meta-p`
-"     in insert mode
-"
 
 let s:yankstack_tail = []
 let g:yankstack_size = 30
@@ -47,6 +44,9 @@ endfunction
 
 function! s:before_new_paste(key, mode)
   call s:before_paste(a:key, a:mode)
+
+  " In visual mode, we put the overwritten text at the *bottom*
+  " of the yank stack.
   if a:mode == 'v'
     call s:before_yank()
     call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
@@ -87,6 +87,10 @@ function! s:paste_from_yankstack(key, mode)
     let head = s:get_yankstack_head()
     silent exec 'normal! gv' . a:key
     call s:set_yankstack_head(head)
+
+  " In visual mode, this function's return value is used in an
+  " expression mapping. In other modes, it is called for its
+  " side effects only.
   elseif a:mode == 'i'
     return a:key
   endif
