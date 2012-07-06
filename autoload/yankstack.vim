@@ -13,7 +13,7 @@ let g:yankstack_size = 30
 let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'n' }
 
 function! s:yank_with_key(key)
-  call s:before_add()
+  call s:before_yank()
   return a:key
 endfunction
 
@@ -22,17 +22,21 @@ function! s:paste_with_key(key, mode)
   return a:key
 endfunction
 
-function! s:substitute_paste(offset, mode)
+function! s:substitute_paste(offset, current_mode)
   if s:last_change_was_paste()
     silent undo
     call s:yankstack_rotate(a:offset)
-    call s:paste_from_yankstack()
+    let mode = s:last_paste.mode
+    let key = s:last_paste.key
   else
-    call s:paste_in_mode(a:mode)
+    let mode = a:current_mode
+    let key = s:default_paste_key(a:current_mode)
   endif
+  call s:before_paste(key, mode)
+  return s:paste_from_yankstack(key, mode)
 endfunction
 
-function! s:before_add()
+function! s:before_yank()
   let head = s:get_yankstack_head()
   if !empty(head.text) && (empty(s:yankstack_tail) || (head != s:yankstack_tail[0]))
     call insert(s:yankstack_tail, head)
@@ -42,15 +46,17 @@ endfunction
 
 function! s:before_paste(key, mode)
   if a:mode == 'v'
-    call s:before_add()
-    call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
-    let tick = b:changedtick+2
-  elseif a:mode == 'i'
-    let tick = b:changedtick+2
-  else
-    let tick = b:changedtick+1
+    call s:before_yank()
   endif
-  let s:last_paste = { 'changedtick': tick, 'key': a:key, 'mode': a:mode }
+  call feedkeys("\<Plug>yankstack_after_paste_" . a:mode, "m")
+  let s:last_paste = { 'changedtick': -1, 'key': a:key, 'mode': a:mode }
+endfunction
+
+function! s:after_paste(mode)
+  if a:mode == 'v'
+    " call s:substitute_paste(1, a:mode)
+  endif
+  let s:last_paste.changedtick = b:changedtick
 endfunction
 
 function! s:yankstack_rotate(offset)
@@ -71,19 +77,16 @@ function! s:yankstack_rotate(offset)
   endwhile
 endfunction
 
-function! s:paste_from_yankstack()
-  let [&autoindent, save_autoindent] = [0, &autoindent]
-  if s:last_paste.mode == 'i'
-    silent exec 'normal! a' . s:last_paste.key
-  elseif s:last_paste.mode == 'v'
+function! s:paste_from_yankstack(key, mode)
+  if a:mode == 'n'
+    silent exec 'normal!' a:key
+  elseif a:mode == 'v'
     let head = s:get_yankstack_head()
-    silent exec 'normal! gv' . s:last_paste.key
+    silent exec 'normal! gv' . a:key
     call s:set_yankstack_head(head)
-  else
-    silent exec 'normal!' s:last_paste.key
+  elseif a:mode == 'i'
+    return a:key
   endif
-  let s:last_paste.changedtick = b:changedtick
-  let &autoindent = save_autoindent
 endfunction
 
 function! s:get_yankstack_head()
@@ -101,18 +104,14 @@ function! s:last_change_was_paste()
 endfunction
 
 function! s:default_register()
-  return (&clipboard == 'unnamed') ? '*' : '"'
+  return (&clipboard == 'unnamed') ? "*" : "\""
 endfunction
 
-function! s:paste_in_mode(mode)
+function! s:default_paste_key(mode)
   if a:mode == 'i'
-    exec "set undolevels=" . &undolevels
-    call s:before_paste("\<C-r>\"", 'i')
-    normal gp
-  elseif a:mode == 'v'
-    normal gvp
+    return "\<C-g>u\<C-r>" . s:default_register()
   else
-    normal p
+    return "p"
   endif
 endfunction
 
@@ -167,12 +166,18 @@ function! yankstack#setup()
   endfor
 endfunction
 
-nnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1, 'n')<CR>
-xnoremap <silent> <Plug>yankstack_substitute_older_paste  :<C-u>call <SID>substitute_paste(v:count1, 'v')<CR>
-inoremap <silent> <Plug>yankstack_substitute_older_paste  <C-o>:<C-u>call <SID>substitute_paste(v:count1, 'i')<CR>
-nnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1, 'n')<CR>
-xnoremap <silent> <Plug>yankstack_substitute_newer_paste  :<C-u>call <SID>substitute_paste(-v:count1, 'v')<CR>
-inoremap <silent> <Plug>yankstack_substitute_newer_paste  <C-o>:<C-u>call <SID>substitute_paste(-v:count1, 'i')<CR>
+nnoremap <silent> <Plug>yankstack_substitute_older_paste :<C-u>call <SID>substitute_paste(v:count1, 'n')<CR>
+nnoremap <silent> <Plug>yankstack_substitute_newer_paste :<C-u>call <SID>substitute_paste(-v:count1, 'n')<CR>
+xnoremap <silent> <Plug>yankstack_substitute_older_paste :<C-u>call <SID>substitute_paste(v:count1, 'v')<CR>
+xnoremap <silent> <Plug>yankstack_substitute_newer_paste :<C-u>call <SID>substitute_paste(-v:count1, 'v')<CR>
+inoremap <silent> <Plug>yankstack_substitute_older_paste <C-r>=<SID>substitute_paste(v:count1, 'i')<CR>
+inoremap <silent> <Plug>yankstack_substitute_newer_paste <C-r>=<SID>substitute_paste(-v:count1, 'i')<CR>
+
+nnoremap <silent> <Plug>yankstack_after_paste_n :call <SID>after_paste('n')<CR>
+nnoremap <silent> <Plug>yankstack_after_paste_v :call <SID>after_paste('v')<CR>
+xnoremap <silent> <Plug>yankstack_after_paste_n :<C-u>call <SID>after_paste('n')<CR>
+xnoremap <silent> <Plug>yankstack_after_paste_v :<C-u>call <SID>after_paste('v')<CR>
+inoremap <silent> <Plug>yankstack_after_paste_i <C-o>:call <SID>after_paste('i')<CR>
 
 if !exists('g:yankstack_map_keys') || g:yankstack_map_keys
   nmap <M-p> <Plug>yankstack_substitute_older_paste

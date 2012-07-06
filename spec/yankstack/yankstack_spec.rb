@@ -5,17 +5,24 @@ describe "Yankstack" do
 
   before(:all) do
     vim.start
+
+    vim.set "visualbell"
+    vim.set "noerrorbells"
+
     vim.set "runtimepath+=#{PLUGIN_ROOT}"
     vim.runtime "plugin/yankstack.vim"
   end
 
-  after(:all)   { vim.stop }
+  # after(:all)   { vim.stop }
   before(:each) { vim.clear_buffer }
 
   shared_examples "yanking and pasting" do
+    let(:yank_keys) { "yw" }
+
     before do
       vim.insert "first_line<CR>", "second_line<CR>", "third_line<CR>", "fourth_line"
-      vim.normal "gg", "yw", "jyw", "jyw", "jyw"
+      vim.normal "gg"
+      vim.normal yank_keys, 'j', yank_keys, 'j', yank_keys, 'j', yank_keys
     end
 
     it "pushes every yanked string to the :Yanks stack" do
@@ -204,20 +211,20 @@ describe "Yankstack" do
     end
 
     context "in insert mode" do
-      describe "typing the `substitute_older_paste` key without pasting first" do
-        before do
-          vim.normal "A<Cr>", "hello "
-          vim.type "<M-p>"
-        end
+      before do
+        vim.normal "A<Cr>", "()", "<Left>"
+        vim.type "<M-p>"
+      end
 
-        it "pastes the most recently yanked text" do
+      describe "typing the `substitute_older_paste` after a character-wise yank" do
+        it "pastes the most recently yanked text after the cursor" do
           vim.line_number.should == 5
-          vim.line.should == "hello fourth_line"
+          vim.line.should == "(fourth_line)"
         end
 
         it "stays in insert mode, with the cursor at the end of the pasted text" do
           vim.should be_in_insert_mode
-          vim.column_number.should == "hello fourth_line".length + 1
+          vim.column_number.should == "(fourth_line".length + 1
         end
 
         describe "typing the `substitute_older_paste` key again" do
@@ -225,12 +232,12 @@ describe "Yankstack" do
 
           it "replaces the pasted text with the previously yanked text" do
             vim.line_number.should == 5
-            vim.line.should == "hello third_line"
+            vim.line.should == "(third_line)"
           end
 
           it "stays in insert mode, with the cursor at the end of the pasted text" do
             vim.should be_in_insert_mode
-            vim.column_number.should == "hello third_line".length + 1
+            vim.column_number.should == "(third_line".length+1
           end
 
           it "rotates the previously yanked text to the top of the yank stack" do
@@ -243,37 +250,35 @@ describe "Yankstack" do
           it "rotates through the yanks when pressed multiple times" do
             vim.type "<M-p>"
             vim.line_number.should == 5
-            vim.line.should == "hello second_line"
+            vim.line.should == "(second_line)"
 
             vim.type "<M-p>"
             vim.line_number.should == 5
-            vim.line.should == "hello first_line"
+            vim.line.should == "(first_line)"
 
             vim.type "<M-P>"
             vim.line_number.should == 5
-            vim.line.should == "hello second_line"
+            vim.line.should == "(second_line)"
 
             vim.type "<M-P>"
             vim.line_number.should == 5
-            vim.line.should == "hello third_line"
+            vim.line.should == "(third_line)"
 
             vim.type "<M-P>"
             vim.line_number.should == 5
-            vim.line.should == "hello fourth_line"
+            vim.line.should == "(fourth_line)"
           end
         end
       end
 
-      describe "typing `substitute_older_paste` after a linewise yank" do
-        before do
-          vim.normal "yy", "A"
-          vim.type "<M-p>"
-        end
+      describe "typing `substitute_older_paste` after a line-wise yank" do
+        let(:yank_keys) { "yy" }
 
-        xit "pastes and puts the cursor after the pasted text" do
-          vim.line_number.should == 5
-          vim.line.should == "fourth_line"
-          vim.column_number.should == "fourth_line".length
+        it "pastes and puts the cursor after the pasted text" do
+          vim.line_number.should == 6
+          vim.line.should == ")"
+          vim.type "<Up>"
+          vim.line.should == "(fourth_line"
         end
       end
     end
