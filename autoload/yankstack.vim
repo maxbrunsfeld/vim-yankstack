@@ -88,7 +88,7 @@ function! s:paste_from_yankstack(key, mode)
     silent exec 'normal! gv' . a:key
     call s:set_yankstack_head(head)
 
-  " In visual mode, this function's return value is used in an
+  " In insert mode, this function's return value is used in an
   " expression mapping. In other modes, it is called for its
   " side effects only.
   elseif a:mode == 'i'
