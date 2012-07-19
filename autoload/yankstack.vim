@@ -1,7 +1,7 @@
 " yankstack.vim - keep track of your history of yanked/killed text
 "
 " Maintainer:   Max Brunsfeld <https://github.com/maxbrunsfeld>
-" Version:      1.0.4
+" Version:      1.0.5
 " Todo:
 "
 

@@ -91,6 +91,11 @@ mappings of your own. To achieve this, just call 'yankstack#setup()'in your
 
 CHANGELOG                                       *yankstack-changelog*
 
+1.0.5 (2012-07-19)
+  - Fix bug where on certain versions of vim, the first time you tried
+    to cycle through your yanks after doing a normal paste, an extra
+    paste was created.
+
 1.0.4 (2012-07-01)
   - Make it so that yankstack-cycling keys cause a normal paste if they are
     used without pasting first. Fix stack-cycling in insert-mode.
