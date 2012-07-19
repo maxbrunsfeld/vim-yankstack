@@ -14,24 +14,44 @@ function! s:yank_with_key(key)
   return a:key
 endfunction
 
-function! s:paste_with_key(key, mode)
-  call s:before_new_paste(a:key, a:mode)
-  return a:key
+function! s:paste_from_yankstack(key, mode, is_new)
+  let s:last_paste = { 'changedtick': -1, 'key': a:key, 'mode': a:mode }
+  call feedkeys("\<Plug>yankstack_after_paste", "m")
+
+  if a:mode == 'n'
+    exec 'normal!' a:key
+  elseif a:mode == 'v'
+    if a:is_new
+      call s:before_yank()
+      call feedkeys("\<Plug>yankstack_substitute_older_paste", "t")
+      exec 'normal! gv' . a:key
+    else
+      let head = s:get_yankstack_head()
+      exec 'normal! gv' . a:key
+      call s:set_yankstack_head(head)
+    endif
+
+  " In insert mode, this function's return value is used in an
+  " expression mapping. In other modes, it is called for its
+  " side effects only.
+  elseif a:mode == 'i'
+    return a:key
+  endif
 endfunction
 
 function! s:substitute_paste(offset, current_mode)
   if s:last_change_was_paste()
-    silent undo
-    call s:yankstack_rotate(a:offset)
+    let is_new = 0
     let mode = s:last_paste.mode
     let key = s:last_paste.key
-    call s:before_paste(key, mode)
+    silent undo
+    call s:yankstack_rotate(a:offset)
   else
+    let is_new = 1
     let mode = a:current_mode
     let key = s:default_paste_key(a:current_mode)
-    call s:before_new_paste(key, mode)
   endif
-  return s:paste_from_yankstack(key, mode)
+  return s:paste_from_yankstack(key, mode, is_new)
 endfunction
 
 function! s:before_yank()
@@ -40,26 +60,6 @@ function! s:before_yank()
     call insert(s:yankstack_tail, head)
     let s:yankstack_tail = s:yankstack_tail[: g:yankstack_size-1]
   endif
-endfunction
-
-function! s:before_new_paste(key, mode)
-  call s:before_paste(a:key, a:mode)
-
-  " In visual mode, we put the overwritten text at the *bottom*
-  " of the yank stack.
-  if a:mode == 'v'
-    call s:before_yank()
-    call feedkeys("\<Plug>yankstack_substitute_older_paste", "m")
-  endif
-endfunction
-
-function! s:before_paste(key, mode)
-  call feedkeys("\<Plug>yankstack_after_paste", "m")
-  let s:last_paste = { 'changedtick': -1, 'key': a:key, 'mode': a:mode }
-endfunction
-
-function! s:after_paste()
-  let s:last_paste.changedtick = b:changedtick
 endfunction
 
 function! s:yankstack_rotate(offset)
@@ -80,22 +80,6 @@ function! s:yankstack_rotate(offset)
   endwhile
 endfunction
 
-function! s:paste_from_yankstack(key, mode)
-  if a:mode == 'n'
-    silent exec 'normal!' a:key
-  elseif a:mode == 'v'
-    let head = s:get_yankstack_head()
-    silent exec 'normal! gv' . a:key
-    call s:set_yankstack_head(head)
-
-  " In insert mode, this function's return value is used in an
-  " expression mapping. In other modes, it is called for its
-  " side effects only.
-  elseif a:mode == 'i'
-    return a:key
-  endif
-endfunction
-
 function! s:get_yankstack_head()
   let reg = s:default_register()
   return { 'text': getreg(reg), 'type': getregtype(reg) }
@@ -104,6 +88,10 @@ endfunction
 function! s:set_yankstack_head(entry)
   let reg = s:default_register()
   call setreg(reg, a:entry.text, a:entry.type)
+endfunction
+
+function! s:after_paste()
+  let s:last_paste.changedtick = b:changedtick
 endfunction
 
 function! s:last_change_was_paste()
@@ -164,8 +152,8 @@ function! yankstack#setup()
   endfor
 
   for key in paste_keys
-    exec 'nnoremap <expr>' key '<SID>paste_with_key("' . key . '", "n")'
-    exec 'xnoremap <expr>' key '<SID>paste_with_key("' . key . '", "v")'
+    exec 'nnoremap' key ':call <SID>paste_from_yankstack("' . key . '", "n", 1)<CR>'
+    exec 'xnoremap' key ':<C-u>call <SID>paste_from_yankstack("' . key . '", "v", 1)<CR>'
   endfor
 
   for key in word_characters
