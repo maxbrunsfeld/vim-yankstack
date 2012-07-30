@@ -134,6 +134,16 @@ describe "Yankstack" do
           end
         end
       end
+
+      it "allows pasting from a non-default register" do
+        reg = 'a'
+        vim.normal "gg"
+        vim.normal %("#{reg}y$)
+        vim.normal "G"
+
+        vim.normal %("#{reg}p)
+        vim.line.should == "first_line"
+      end
     end
 
     context "in visual mode, with text highlighted" do
