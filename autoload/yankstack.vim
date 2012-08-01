@@ -156,9 +156,10 @@ function! yankstack#setup()
     exec 'xnoremap <expr>'  key '<SID>yank_with_key("' . key . '")'
   endfor
 
+  let clear_cmd = ':echo ""<CR>'
   for key in paste_keys
-    exec 'nnoremap' key ':call <SID>paste_with_key("' . key . '", "n", v:register)<CR><C-l>'
-    exec 'xnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register)<CR><C-l>'
+    exec 'nnoremap' key ':call <SID>paste_with_key("' . key . '", "n", v:register)<CR>' . clear_cmd
+    exec 'xnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register)<CR>' . clear_cmd
   endfor
 
   for key in word_characters
