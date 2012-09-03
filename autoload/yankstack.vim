@@ -14,8 +14,9 @@ function! s:yank_with_key(key)
   return a:key
 endfunction
 
-function! s:paste_with_key(key, mode, register)
-  let keys = (a:register == s:default_register()) ? a:key : ('"' . a:register . a:key)
+function! s:paste_with_key(key, mode, register, count)
+  let with_count = a:count . a:key
+  let keys = (a:register == s:default_register()) ? with_count : ('"' . a:register . with_count)
   return s:paste_from_yankstack(keys, a:mode, 1)
 endfunction
 
@@ -158,8 +159,8 @@ function! yankstack#setup()
 
   let clear_cmd = ':echo ""<CR>'
   for key in paste_keys
-    exec 'nnoremap' key ':call <SID>paste_with_key("' . key . '", "n", v:register)<CR>' . clear_cmd
-    exec 'xnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register)<CR>' . clear_cmd
+    exec 'nnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "n", v:register, v:count1)<CR>' . clear_cmd
+    exec 'xnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register, v:count1)<CR>' . clear_cmd
   endfor
 
   for key in word_characters

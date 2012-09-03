@@ -144,6 +144,12 @@ describe "Yankstack" do
         vim.normal %("#{reg}p)
         vim.line.should == "first_line"
       end
+
+      it "allows pasting with a count" do
+        vim.normal "3p"
+        vim.line_number.should == 5
+        vim.line.should == "fourth_line" * 3
+      end
     end
 
     context "in visual mode, with text highlighted" do
@@ -217,6 +223,21 @@ describe "Yankstack" do
           vim.line_number.should == 5
           vim.line.should == "fourth_line"
         end
+      end
+
+      it "allows pasting with a count" do
+        vim.type "3p"
+
+        vim.line_number.should == 5
+        vim.line.should == "fourth_line"
+
+        vim.normal 'j'
+        vim.line_number.should == 6
+        vim.line.should == "fourth_line"
+
+        vim.normal 'j'
+        vim.line_number.should == 7
+        vim.line.should == "fourth_line"
       end
     end
 
