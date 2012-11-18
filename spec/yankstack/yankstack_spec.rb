@@ -326,6 +326,12 @@ describe "Yankstack" do
   end
 
   describe "when the `unnamedplus` clipboard option is enabled" do
+    before { vim.set "clipboard", "unnamedplus" }
+
+    it_has_behavior "yanking and pasting"
+  end
+
+  describe "when the `unnamed,unnamedplus` clipboard option is enabled" do
     before { vim.set "clipboard", "unnamed,unnamedplus" }
 
     it_has_behavior "yanking and pasting"
