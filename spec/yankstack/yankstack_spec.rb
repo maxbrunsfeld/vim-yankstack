@@ -321,19 +321,16 @@ describe "Yankstack" do
 
   describe "when using the system clipboard as the default register" do
     before { vim.set "clipboard", "unnamed" }
-
     it_has_behavior "yanking and pasting"
   end
 
-  describe "when the `unnamedplus` clipboard option is enabled" do
-    before { vim.set "clipboard", "unnamedplus" }
+  # describe "when `clipboard` is set to `unnamedplus`" do
+    # before { vim.set "clipboard", "unnamedplus" }
+    # it_has_behavior "yanking and pasting"
+  # end
 
-    it_has_behavior "yanking and pasting"
-  end
-
-  describe "when the `unnamed,unnamedplus` clipboard option is enabled" do
+  describe "when `clipboard` is set to `unnamed,unnamedplus`" do
     before { vim.set "clipboard", "unnamed,unnamedplus" }
-
     it_has_behavior "yanking and pasting"
   end
 
