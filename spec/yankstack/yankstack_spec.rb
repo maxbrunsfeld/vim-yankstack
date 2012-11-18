@@ -325,6 +325,12 @@ describe "Yankstack" do
     it_has_behavior "yanking and pasting"
   end
 
+  describe "when the `unnamedplus` clipboard option is enabled" do
+    before { vim.set "clipboard", "unnamed,unnamedplus" }
+
+    it_has_behavior "yanking and pasting"
+  end
+
   def yank_entries
     @yank_entries ||= vim.command("Yanks").split("\n")[1..-1]
   end

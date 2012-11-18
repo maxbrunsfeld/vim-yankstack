@@ -105,7 +105,12 @@ function! s:last_change_was_paste()
 endfunction
 
 function! s:default_register()
-  return (&clipboard == 'unnamed') ? "*" : "\""
+  let clipboard_flags = split(&clipboard, ',')
+  if index(clipboard_flags, 'unnamed') >= 0
+    return "*"
+  else
+    return "\""
+  endif
 endfunction
 
 function! s:default_paste_key(mode)
