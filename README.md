@@ -10,13 +10,16 @@ previously. It effectively turns your default register into a stack, and lets
 you cycle through the items in the stack after doing a paste.
 
 This plugin is intended to be a simpler alternative to the
-[yankring](https://github.com/chrismetcalf/vim-yankring) plugin.
+[yankring](https://github.com/chrismetcalf/vim-yankring) plugin. It has a fairly
+complete [test suite](https://github.com/maxbrunsfeld/vim-yankstack/blob/master/spec/yankstack/yankstack_spec.rb)
+based on [rspec](https://www.relishapp.com/rspec)
+and [vimbot](https://github.com/maxbrunsfeld/vimbot).
 
 ## Installation ##
 
 I recommend loading your plugins with
-[pathogen](https://github.com/tpope/vim-pathogen), so you can just clone this
-repo into your ```bundle``` directory.
+[vundle](https://github.com/gmarik/vundle) or 
+[pathogen](https://github.com/tpope/vim-pathogen).
 
 ## Key Mappings ##
 
