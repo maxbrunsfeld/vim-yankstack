@@ -72,9 +72,6 @@ For example, if you wanted to define some mappings based on your |leader| key, y
   nmap <leader>p <Plug>yankstack_substitute_older_paste
   nmap <leader>P <Plug>yankstack_substitute_older_paste
 
-Also, if you want to load yankstack without the default key mappings, just
-``` let g:yankstack_map_keys = 0 ```
-in your .vimrc file.
 
 COMPATIBILITY                                   *yankstack-compatibility*
 
