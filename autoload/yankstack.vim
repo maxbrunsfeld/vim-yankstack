@@ -9,6 +9,10 @@ let s:yankstack_tail = []
 let g:yankstack_size = 30
 let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'n' }
 
+if !exists('g:yankstack_yank_keys')
+  let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
+endif
+
 function! s:yank_with_key(key)
   call s:before_yank()
   return a:key
@@ -155,11 +159,10 @@ function! yankstack#setup()
   if exists('g:yankstack_did_setup') | return | endif
   let g:yankstack_did_setup = 1
 
-  let yank_keys  = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
   let paste_keys = ['p', 'P', 'gp', 'gP']
   let word_characters = split("qwertyuiopasdfghjklzxcvbnm1234567890_", '\zs')
 
-  for key in yank_keys
+  for key in g:yankstack_yank_keys
     exec 'nnoremap <expr>'  key '<SID>yank_with_key("' . key . '")'
     exec 'xnoremap <expr>'  key '<SID>yank_with_key("' . key . '")'
   endfor
