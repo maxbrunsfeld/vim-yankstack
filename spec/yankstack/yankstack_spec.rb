@@ -8,12 +8,15 @@ describe "Yankstack" do
 
     vim.set "visualbell"
     vim.set "noerrorbells"
+    vim.set "macmeta"
 
     vim.set "runtimepath+=#{PLUGIN_ROOT}"
     vim.runtime "plugin/yankstack.vim"
+
+    vim.source VIM_REPEAT_PATH
   end
 
-  after(:all)   { vim.stop }
+  # after(:all)   { vim.stop }
   before(:each) { vim.clear_buffer }
 
   shared_examples "yanking and pasting" do
@@ -69,6 +72,15 @@ describe "Yankstack" do
         it "pastes the most recently yanked string" do
           vim.line_number.should == 5
           vim.line.should == "fourth_line"
+        end
+
+        describe "pressing the repeat key with '.'" do
+          it "pastes again" do
+            pending unless File.exists?(VIM_REPEAT_PATH)
+
+            vim.type "."
+            vim.line.should == "fourth_linefourth_line"
+          end
         end
 
         describe "typing the 'cycle paste' key" do

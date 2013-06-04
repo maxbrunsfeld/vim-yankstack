@@ -7,7 +7,7 @@
 
 let s:yankstack_tail = []
 let g:yankstack_size = 30
-let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'n' }
+let s:last_paste = { 'changedtick': -1, 'key': '', 'mode': 'n', 'count': 1, 'register': '' }
 
 function! s:yank_with_key(key)
   call s:before_yank()
@@ -15,25 +15,27 @@ function! s:yank_with_key(key)
 endfunction
 
 function! s:paste_with_key(key, mode, register, count)
-  let with_count = a:count . a:key
-  let keys = (a:register == s:default_register()) ? with_count : ('"' . a:register . with_count)
-  return s:paste_from_yankstack(keys, a:mode, 1)
+  return s:paste_from_yankstack(a:key, a:mode, a:register, a:count, 1)
 endfunction
 
-function! s:paste_from_yankstack(key, mode, is_new)
-  let s:last_paste = { 'changedtick': -1, 'key': a:key, 'mode': a:mode }
+function! s:paste_from_yankstack(key, mode, register, count, is_new)
+  echom "In paste_from_yankstack" a:key a:mode a:is_new
+
+  let keys = a:count . a:key
+  let keys = (a:register == s:default_register()) ? keys : ('"' . a:register . keys)
+  let s:last_paste = { 'key': a:key, 'mode': a:mode, 'register': a:register, 'count': a:count, 'changedtick': -1 }
   call feedkeys("\<Plug>yankstack_after_paste", "m")
 
   if a:mode == 'n'
-    exec 'normal!' a:key
+    exec 'normal!' keys
   elseif a:mode == 'v'
     if a:is_new
       call s:before_yank()
       call feedkeys("\<Plug>yankstack_substitute_older_paste", "t")
-      exec 'normal! gv' . a:key
+      exec 'normal! gv' . keys
     else
       let head = s:get_yankstack_head()
-      exec 'normal! gv' . a:key
+      exec 'normal! gv' . keys
       call s:set_yankstack_head(head)
     endif
 
@@ -41,23 +43,21 @@ function! s:paste_from_yankstack(key, mode, is_new)
   " expression mapping. In other modes, it is called for its
   " side effects only.
   elseif a:mode == 'i'
-    return a:key
+    return keys
   endif
+
+  silent! call repeat#setreg(a:register)
+  silent! call repeat#set(a:key, a:count)
 endfunction
 
 function! s:substitute_paste(offset, current_mode)
   if s:last_change_was_paste()
-    let is_new = 0
-    let mode = s:last_paste.mode
-    let key = s:last_paste.key
     silent undo
     call s:yankstack_rotate(a:offset)
+    return s:paste_from_yankstack(s:last_paste.key, s:last_paste.mode, s:last_paste.register, s:last_paste.count, 0)
   else
-    let is_new = 1
-    let mode = a:current_mode
-    let key = s:default_paste_key(a:current_mode)
+    return s:paste_from_yankstack(s:default_paste_key(a:current_mode), a:current_mode, v:register, '', 1)
   endif
-  return s:paste_from_yankstack(key, mode, is_new)
 endfunction
 
 function! s:before_yank()
