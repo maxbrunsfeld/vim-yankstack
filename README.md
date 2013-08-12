@@ -79,6 +79,13 @@ nmap Y y$
 " other mappings involving y, d, c, etc
 ```
 
+## F.A.Q. ##
+
+1. Meta-p & Meta-P is not working on Linux when running vim from terminal(s)?
+
+   This is because most of the terminals are running in 7bit mode. To fix this follow the [wiki](https://github.com/maxbrunsfeld/vim-yankstack/wiki/Linux-terminal-configurations-for-correct-meta-key-handling)
+
+
 ## Contributing, Feedback ##
 
 I'd enjoy hearing anybody's feedback on yankstack, and welcome any contribution.
