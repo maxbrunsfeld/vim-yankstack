@@ -164,6 +164,10 @@ function! yankstack#setup()
     exec 'xnoremap <expr>'  key '<SID>yank_with_key("' . key . '")'
   endfor
 
+  if exists("g:yankstack_Y_consistency")
+    exec 'nnoremap <expr> Y <SID>yank_with_key("y$")'
+  endif
+
   let clear_cmd = ':echo ""<CR>'
   for key in paste_keys
     exec 'nnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "n", v:register, v:count1)<CR>' . clear_cmd
