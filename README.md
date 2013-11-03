@@ -29,14 +29,15 @@ By default, yankstack adds only 2 key bindings, in normal and visual modes:
 - ```meta-shift-p```  - cycle *forwards* through your history of yanks
 
 After pasting some text using ```p``` or ```P```, you can cycle through your
-yank history using these commands.
+yank history using these commands. Typing either of these keys *without* pasting first 
+will do a normal paste (the same as typing `p`). This also works in insert mode.
 
-Typing either of these keys *without* pasting first will do a normal paste
-(the same as typing `p`). This also works in insert mode.
+### the 'meta' key
 
-A note about the meta key - if you're using MacVim, and you want to use
+If you're using MacVim, and you want to use
 this plugin's default key bindings (or any bindings involving the `option`
-key), you must ```:set macmeta```
+key), you must ```:set macmeta```. On Linux, you may have issues with the meta key if your terminal is running in 7bit mode.
+Instructions for dealing with this can be found on the [wiki](https://github.com/maxbrunsfeld/vim-yankstack/wiki/Linux-terminal-configurations-for-correct-meta-key-handling)
 
 ## Commands ##
 
@@ -78,13 +79,6 @@ call yankstack#setup()
 nmap Y y$
 " other mappings involving y, d, c, etc
 ```
-
-## F.A.Q. ##
-
-1. Meta-p & Meta-P is not working on Linux when running vim from terminal(s)?
-
-   This is because most of the terminals are running in 7bit mode. To fix this follow the [wiki](https://github.com/maxbrunsfeld/vim-yankstack/wiki/Linux-terminal-configurations-for-correct-meta-key-handling)
-
 
 ## Contributing, Feedback ##
 
