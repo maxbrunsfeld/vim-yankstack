@@ -123,7 +123,7 @@ function! s:default_paste_key(mode)
   endif
 endfunction
 
-function! g:yankstack()
+function! g:Yankstack()
   return [s:get_yankstack_head()] + s:yankstack_tail
 endfunction
 
@@ -131,7 +131,7 @@ command! -nargs=0 Yanks call s:show_yanks()
 function! s:show_yanks()
   echohl WarningMsg | echo "--- Yanks ---" | echohl None
   let i = 0
-  for yank in g:yankstack()
+  for yank in g:Yankstack()
     call s:show_yank(yank, i)
     let i += 1
   endfor
