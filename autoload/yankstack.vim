@@ -19,8 +19,6 @@ function! s:paste_with_key(key, mode, register, count)
 endfunction
 
 function! s:paste_from_yankstack(key, mode, register, count, is_new)
-  echom "In paste_from_yankstack" a:key a:mode a:is_new
-
   let keys = a:count . a:key
   let keys = (a:register == s:default_register()) ? keys : ('"' . a:register . keys)
   let s:last_paste = { 'key': a:key, 'mode': a:mode, 'register': a:register, 'count': a:count, 'changedtick': -1 }
