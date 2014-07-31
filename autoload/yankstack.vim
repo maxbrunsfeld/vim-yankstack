@@ -158,14 +158,14 @@ function! yankstack#setup()
   let word_characters = split("qwertyuiopasdfghjklzxcvbnm1234567890_", '\zs')
 
   for key in yank_keys
-    exec 'nnoremap <expr>'  key '<SID>yank_with_key("' . key . '")'
-    exec 'xnoremap <expr>'  key '<SID>yank_with_key("' . key . '")'
+    exec 'nnoremap <silent> <expr>'  key '<SID>yank_with_key("' . key . '")'
+    exec 'xnoremap <silent> <expr>'  key '<SID>yank_with_key("' . key . '")'
   endfor
 
   let clear_cmd = ':echo ""<CR>'
   for key in paste_keys
-    exec 'nnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "n", v:register, v:count1)<CR>' . clear_cmd
-    exec 'xnoremap' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register, v:count1)<CR>' . clear_cmd
+    exec 'nnoremap <silent> ' key ':<C-u>call <SID>paste_with_key("' . key . '", "n", v:register, v:count1)<CR>' . clear_cmd
+    exec 'xnoremap <silent> ' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register, v:count1)<CR>' . clear_cmd
   endfor
 
   for key in word_characters
