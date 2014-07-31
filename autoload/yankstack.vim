@@ -162,10 +162,9 @@ function! yankstack#setup()
     exec 'xnoremap <silent> <expr>'  key '<SID>yank_with_key("' . key . '")'
   endfor
 
-  let clear_cmd = ':echo ""<CR>'
   for key in paste_keys
-    exec 'nnoremap <silent> ' key ':<C-u>call <SID>paste_with_key("' . key . '", "n", v:register, v:count1)<CR>' . clear_cmd
-    exec 'xnoremap <silent> ' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register, v:count1)<CR>' . clear_cmd
+    exec 'nnoremap <silent>' key ':<C-u>call <SID>paste_with_key("' . key . '", "n", v:register, v:count1)<CR>'
+    exec 'xnoremap <silent>' key ':<C-u>call <SID>paste_with_key("' . key . '", "v", v:register, v:count1)<CR>'
   endfor
 
   for key in word_characters
