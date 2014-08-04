@@ -336,16 +336,6 @@ describe "Yankstack" do
     it_has_behavior "yanking and pasting"
   end
 
-  # describe "when `clipboard` is set to `unnamedplus`" do
-    # before { vim.set "clipboard", "unnamedplus" }
-    # it_has_behavior "yanking and pasting"
-  # end
-
-  describe "when `clipboard` is set to `unnamed,unnamedplus`" do
-    before { vim.set "clipboard", "unnamed,unnamedplus" }
-    it_has_behavior "yanking and pasting"
-  end
-
   def yank_entries
     @yank_entries ||= vim.command("Yanks").split("\n")[1..-1]
   end
