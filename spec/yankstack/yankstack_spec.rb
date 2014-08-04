@@ -16,7 +16,7 @@ describe "Yankstack" do
     vim.source VIM_REPEAT_PATH
   end
 
-  # after(:all)   { vim.stop }
+  after(:all)   { vim.stop }
   before(:each) { vim.clear_buffer }
 
   shared_examples "yanking and pasting" do
