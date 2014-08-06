@@ -80,6 +80,13 @@ nmap Y y$
 " other mappings involving y, d, c, etc
 ```
 
+You can also prevent certain keys from being remapped by setting the `g:yankstack_yank_keys`
+to the keys of your choosing. For example, if you only want Yankstack to remap `y` and `d`:
+
+```
+let g:yankstack_yank_keys = ['y', 'd']
+```
+
 ## Contributing, Feedback ##
 
 I'd enjoy hearing anybody's feedback on yankstack, and welcome any contribution.
@@ -87,6 +94,9 @@ Check it out on [github](https://github.com/maxbrunsfeld/vim-yankstack)!
 
 ## Changelog ##
 
+
+### 1.0.6 (2014-08-04)
+  - Allow customization of the list of keys to be remapped.
 
 ### 1.0.5 (2012-07-19)
   - Fix bug where on certain versions of vim, the first time you tried
