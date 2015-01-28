@@ -161,8 +161,12 @@ function! yankstack#setup()
   let word_characters = split("qwertyuiopasdfghjklzxcvbnm1234567890_", '\zs')
 
   for key in g:yankstack_yank_keys
-    exec 'nnoremap <silent> <expr>'  key '<SID>yank_with_key("' . key . '")'
-    exec 'xnoremap <silent> <expr>'  key '<SID>yank_with_key("' . key . '")'
+    if maparg(key, "x") != ""
+        echom "The key " . key . " is already mapped as " . maparg(key, "x")
+        echom "See https://github.com/maxbrunsfeld/vim-yankstack/issues/18 for details"
+    endif
+    exec 'nnoremap <unique> <expr>'  key '<SID>yank_with_key("' . key . '")'
+    exec 'xnoremap <unique> <expr>'  key '<SID>yank_with_key("' . key . '")'
   endfor
 
   for key in paste_keys
