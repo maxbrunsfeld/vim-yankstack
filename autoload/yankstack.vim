@@ -19,7 +19,8 @@ function! s:yank_with_key(key)
 endfunction
 
 function! s:paste_with_key(key, mode, register, count)
-  return s:paste_from_yankstack(a:key, a:mode, a:register, a:count, 1)
+  let final_reg = a:register ==# '_' ? s:default_register() : a:register
+  return s:paste_from_yankstack(a:key, a:mode, final_reg, a:count, 1)
 endfunction
 
 function! s:paste_from_yankstack(key, mode, register, count, is_new)
