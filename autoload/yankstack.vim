@@ -13,6 +13,31 @@ if !exists('g:yankstack_yank_keys')
   let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
 endif
 
+function! s:unique()
+  let head = s:get_yankstack_head()
+  let item_index = 0
+  while item_index < len(s:yankstack_tail)
+      if s:yankstack_tail[item_index] == head
+          call remove(s:yankstack_tail, item_index)
+      else
+          let item_index += 1
+      endif
+  endwhile
+  
+  let item_index = 0
+  while item_index + 1 < len(s:yankstack_tail)
+      let next_index = item_index + 1
+      while next_index < len(s:yankstack_tail)
+          if s:yankstack_tail[item_index] == s:yankstack_tail[next_index]
+              call remove(s:yankstack_tail, next_index)
+              continue
+          endif
+          let next_index += 1
+      endwhile
+      let item_index += 1
+  endwhile
+endfunction
+
 function! s:yank_with_key(key)
   call s:before_yank()
   return a:key
@@ -23,6 +48,7 @@ function! s:paste_with_key(key, mode, register, count)
 endfunction
 
 function! s:paste_from_yankstack(key, mode, register, count, is_new)
+  call <sid>unique()
   let keys = a:count . a:key
   let keys = (a:register == s:default_register()) ? keys : ('"' . a:register . keys)
   let s:last_paste = { 'key': a:key, 'mode': a:mode, 'register': a:register, 'count': a:count, 'changedtick': -1 }
@@ -65,6 +91,7 @@ endfunction
 function! s:before_yank()
   let head = s:get_yankstack_head()
   if !empty(head.text) && (empty(s:yankstack_tail) || (head != s:yankstack_tail[0]))
+    call <sid>unique()
     call insert(s:yankstack_tail, head)
     let s:yankstack_tail = s:yankstack_tail[: g:yankstack_size-1]
   endif
@@ -81,6 +108,7 @@ function! s:yankstack_rotate(offset)
       let offset_left -= 1
     elseif offset_left < 0
       let entry = remove(s:yankstack_tail, -1)
+      call <sid>unique()
       call insert(s:yankstack_tail, head)
       let offset_left += 1
     endif
@@ -131,6 +159,7 @@ endfunction
 
 command! -nargs=0 Yanks call s:show_yanks()
 function! s:show_yanks()
+  call <sid>unique()
   echohl WarningMsg | echo "--- Yanks ---" | echohl None
   let i = 0
   for yank in g:Yankstack()
