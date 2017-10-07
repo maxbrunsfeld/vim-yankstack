@@ -173,6 +173,10 @@ function! yankstack#setup()
   for key in word_characters
     exec 'smap <expr>' key '<SID>yank_with_key("' . key . '")'
   endfor
+
+  if exists('g:yankstack_after_setup')
+      exec 'call '.g:yankstack_after_setup.'()'
+  endif
 endfunction
 
 nnoremap <silent> <Plug>yankstack_substitute_older_paste :<C-u>call <SID>substitute_paste(v:count1, 'n')<CR>

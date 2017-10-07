@@ -80,6 +80,17 @@ nmap Y y$
 " other mappings involving y, d, c, etc
 ```
 
+Alternatively, if you can't afford to call 'yankstack#setup()' too early in
+your |vimrc| you can still tell yankstack to call a user defined function when
+the initial setup has run:
+
+```
+function! YankStackAfterSetup()
+    nmap Y y$
+endfunction
+let g:yankstack_after_setup = 'YankStackAfterSetup'
+```
+
 You can also prevent certain keys from being remapped by setting the `g:yankstack_yank_keys`
 to the keys of your choosing. For example, if you only want Yankstack to remap `y` and `d`:
 
@@ -94,6 +105,8 @@ Check it out on [github](https://github.com/maxbrunsfeld/vim-yankstack)!
 
 ## Changelog ##
 
+### 1.0.7 (2017-10-07)
+  - Allow function to be executed after initial setup has run.
 
 ### 1.0.6 (2014-08-04)
   - Allow customization of the list of keys to be remapped.
