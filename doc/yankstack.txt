@@ -100,6 +100,9 @@ CHANGELOG                                       *yankstack-changelog*
 1.0.7 (2017-10-07)
   - Allow function to be executed after initial setup has run.
 
+1.0.6 (2014-08-04)
+  - Allow customization of the list of keys to be remapped.
+
 1.0.5 (2012-07-19)
   - Fix bug where on certain versions of vim, the first time you tried
     to cycle through your yanks after doing a normal paste, an extra
