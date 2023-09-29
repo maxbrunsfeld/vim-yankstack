@@ -72,6 +72,18 @@ For example, if you wanted to define some mappings based on your |leader| key, y
   nmap <leader>p <Plug>yankstack_substitute_older_paste
   nmap <leader>P <Plug>yankstack_substitute_newer_paste
 
+You can also prevent certain keys from being remapped by setting the `g:yankstack_yank_keys`
+to the keys of your choosing. For example, if you only want Yankstack to remap `y` and `d`:
+
+```
+let g:yankstack_yank_keys = ['y', 'd']
+```
+
+the default value of this variable is
+
+```
+let g:yankstack_yank_keys = ['c', 'C', 'd', 'D', 's', 'S', 'x', 'X', 'y', 'Y']
+```
 
 COMPATIBILITY                                   *yankstack-compatibility*
 
