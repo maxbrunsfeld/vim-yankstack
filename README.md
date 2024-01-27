@@ -90,7 +90,7 @@ let g:yankstack_yank_keys = ['y', 'd']
 ## Contributing, Feedback ##
 
 I'd enjoy hearing anybody's feedback on yankstack, and welcome any contribution.
-Check it out on [github](https://github.com/maxbrunsfeld/vim-yankstack)!
+Check it out on [github](https://github.com/maxbrunsfeld/vim-ytitleankstack)!
 
 ## Changelog ##
 
